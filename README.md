@@ -22,7 +22,7 @@ Rscript -e "rmarkdown::render('test.Rmd', output_format = 'all')"
 ```
 
 ### 3. Pseudocode for data processing
-- Please find the pseudocodes for data processing pipelines [here]()
+- Please find the pseudocodes for data processing pipelines [here](https://github.com/Rashedul/bcell_cll_epigenomes/blob/main/docs/pseudocode.md)
 
 ### 4. diffER pipeline
 
