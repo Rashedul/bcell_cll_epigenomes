@@ -1,28 +1,30 @@
-# bcell_cll_epigenomes
+### B-cell and CLL epigenomes
 Source code of integrative B-cell and CLL epigenomes 
 
-#### Dependencies
-```
-Ubuntu 22.04.4 LTS
-R version 4.1.2
-pandoc 2.9.2.1
-```
+### Rscripts for figures 
+[Find codes and script here](https://rashedul.github.io/bcell_cll_epigenomes/)
 
-#### generate all plots
+### Generate figures
 
-In Linux terminal, please run the command to generate plots. This will create .md and .html file which you can open in browser. Those files have already been generated here:
+#### Dependencies and requirements
 
-- 
-- 
+- Ubuntu 22.04.4 LTS or
+- iOS 
+- R version 4.1.2
+- pandoc 2.9.2.1
+- RAM 32GB
+- Runtime ~60 minutes
+
+
+In Linux terminal, please run the command to generate plots. This will create .md and .html files. 
 
 ```
 cd rmarkdown
 Rscript -e "rmarkdown::render('test.Rmd', output_format = 'all')"
 ```
 
-#### Pseudocode for upstream processes
+### Pseudocode for data processing
 
+### diffER pipeline
 
-#### diffER pipeline
-
-#### citation
+### Citation
