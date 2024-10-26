@@ -45,6 +45,14 @@ Rscript -e "rmarkdown::render('bcell_cll_epigenomes_plots.Rmd', output_format = 
 
 ### 4. diffER pipeline 
 
-- Please find the diffEr pipeline [here](https://github.com/Rashedul/diffER)
+diffER identifies differential enrichment of ChIP-seq peaks between two groups.
 
-### 5. Citation 
+- Please find the diffER pipeline [here](https://github.com/Rashedul/diffER)
+
+### 5. CRIS pipeline 
+
+CRIS used RNA-seq data to detect perccentage of somatic hypermutations of IGHV genes to classify CLL cases.
+
+- Please find the CRIS pipeline [here](https://github.com/Rashedul/CRIS)
+
+### 6. Citation 
