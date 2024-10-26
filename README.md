@@ -11,12 +11,13 @@ Source code of integrative B-cell and CLL epigenomes
 - Ubuntu >= 22.04.4 LTS or macOS >= 13.7 
 - R version >= 4.1.2
 - pandoc >= 2.9.2.1
-- RAM ~32GB
-- Runtime ~60 minutes
+- conda >= 24.7.1
+- RAM ~32GB 
+- Runtime ~60 minutes 
 
 #### Create R environment and install R packages
 
-On Linux/Unix terminal, please run the command to creat a R environment and to install R packages. This will create R environment named `renv` and install all packages within this environment. 
+On Linux/Unix terminal, please run the command to creat a R environment and to install R packages. This will create R environment named `renv` and install all packages within this environment. Note that you need to have conda installed. 
 
 ```
 # Install packages from conda
@@ -42,8 +43,8 @@ Rscript -e "rmarkdown::render('bcell_cll_epigenomes_plots.Rmd', output_format = 
 ### 3. Pseudocode for data processing
 - Please find the pseudocodes for data processing pipelines [here](https://github.com/Rashedul/bcell_cll_epigenomes/blob/main/docs/pseudocode.md)
 
-### 4. diffER pipeline
+### 4. diffER pipeline 
 
 - Please find the diffEr pipeline [here](https://github.com/Rashedul/diffER)
 
-### 5. Citation
+### 5. Citation 
