@@ -6,19 +6,37 @@ Source code of integrative B-cell and CLL epigenomes
 
 ### 2. Generate figures
 
-#### Dependencies and requirements
+#### Requirements
 
 - Ubuntu >= 22.04.4 LTS or macOS >= 13.7 
 - R version >= 4.1.2
 - pandoc >= 2.9.2.1
-- RAM 32GB
+- RAM ~32GB
 - Runtime ~60 minutes
 
-In Linux/Unix terminal, please run the command to generate plots. This will generate .md and .html files containing scripts and plots. 
+#### Create R environment and install R packages
+
+On Linux/Unix terminal, please run the command to creat a R environment and to install R packages. This will create R environment named `renv` and install all packages within this environment. 
 
 ```
-cd rmarkdown
-Rscript -e "rmarkdown::render('test.Rmd', output_format = 'all')"
+# Install packages from conda
+conda create -n renv r-base -y
+conda activate renv
+conda install -c conda-forge -y r-ggplot2 r-dplyr
+
+# Install packages outside of conda
+
+# did not install dependencies
+R -e "install.packages('tidyverse', repos='http://cran.r-project.org', dependencies = TRUE)"
+```
+
+#### Run Rscript to generate plots
+
+On Linux/Unix terminal, please run the command to generate plots. This will generate .md and .html files containing scripts and plots. 
+
+```
+cd docs
+Rscript -e "rmarkdown::render('bcell_cll_epigenomes_plots.Rmd', output_format = 'all')"
 ```
 
 ### 3. Pseudocode for data processing
