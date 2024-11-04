@@ -51,7 +51,7 @@ diffER identifies differential enrichment of ChIP-seq peaks between two groups.
 
 ### 5. CRIS pipeline 
 
-CRIS used RNA-seq data to detect perccentage of somatic hypermutations of IGHV genes to classify CLL cases.
+CRIS uses RNA-seq data to detect perccentage of somatic hypermutations of IGHV genes to classify CLL cases.
 
 - Please find the CRIS pipeline [here](https://github.com/Rashedul/CRIS)
 
