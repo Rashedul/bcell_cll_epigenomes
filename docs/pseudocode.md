@@ -31,37 +31,64 @@ java -jar -Xmx10G MarkDuplicates.jar I=file.sorted.bam O=file.sorted.dups_marked
 #### ChIP-seq data analysis
 
 ```
-# Peak calling with findER2
-java -jar -Xmx25G /path/finder2.jar inputBam:$input.bam signalBam:$signal.bam outDir:$out acgtDir:/path/hg38/ACGT
+## Peak calling with findER2 (in-house)
+# Single-end libs 
+java -jar -Xmx25G /home/mbilenky/ew/Solexa_Java/jarsToDeploy/finder2.jar inputBam:$inp signalBam:$sig outDir:$out acgtDir:/projects/epigenomics2/users/mbilenky/resources/hg38/ACGT SE
 
-# RPKM normalization of bigwig files using deeptools
-bamCoverage -b file.bam -o /outpath/file.bam.bw -of bigwig -bs 50 --effectiveGenomeSize 2913022398 --normalizeUsing RPKM --extendReads --ignoreDuplicates -p max/2
+# Paired-end libs
+$java -jar -Xmx25G /home/mbilenky/ew/Solexa_Java/jarsToDeploy/finder2.jar inputBam:$inp signalBam:$sig outDir:$out acgtDir:/projects/epigenomics2/users/mbilenky/resources/hg38/ACGT
+
+## RPKM normalization of bw files
+# Single-end libs 
+for f in files*bam; 
+do echo $f;
+bamCoverage -b $f -o ../bigwig_RPKM_norm_50bp/$f.bw -of bigwig -bs 50 --effectiveGenomeSize 2913022398 --normalizeUsing RPKM --extendReads 175 --ignoreDuplicates -p max/2;
+done
+
+# Paired-end libs
+for f in files*bam; 
+do echo $f;
+bamCoverage -b $f -o ../bigwig_RPKM_norm_50bp/$f.bw -of bigwig -bs 50 --effectiveGenomeSize 2913022398 --normalizeUsing RPKM --extendReads --ignoreDuplicates -p max/2;
+done
 
 # HOMER motif finding
-findMotifsGenome.pl regionOfInterest.bed hg19 ./ size 200 -len 8 -p 16  
+findMotifsGenome.pl regionOfInterest.bed hg38 ./ size 200 -len 8 -p 16  
 
-# generate RPKM matrix using deeptools
+## Generate profile plot my merging samples
+cd /path/bw/
+m=ENS_RPKM_more0.5.v2.bed # protein conding genes with >=0.05 RPKM
+l=ENS_RPKM_less0.5.v2.bed # protein conding genes with <0.05 RPKM
+
+out=/path/
+
+for bw in *CLL*bw; do echo $bw;
+
 computeMatrix reference-point --referencePoint center \
-                              -S KOPTK1_RUNX1-On_H3K27ac.bam.bw \
-                                 KOPTK1_RUNX1-Off_H3K27ac.bam.bw \
-                              -R RUNX1_peaks.bed \
-                              -a 2000 \
-                              -b 2000 \
-                              -p 16 \
-                              --skipZeros -o matrix.gz 
+                              --regionBodyLength 5000 \
+                              --upstream 500 \
+                              --downstream 500 \
+                              -S  $bw \
+                              -R $m $l \
+                              -p 40 \
+                              --smartLabels \
+                              --skipZeros -o $out/deeptools/$bw.matrix.gz
+done 
 
-# plotheatmap using deeptools
-plotHeatmap -m matrix.gz \
-            -out RUNX1_H3K27ac.png \
-            --dpi 300 \
-            --colorList '#ffeda0,blue' \
-            -y 'Enrichment' \
-            --heatmapWidth 5 \
-            --zMin 0  --zMax 15 
+cd $out/deeptools/
+computeMatrixOperations rbind -m *matrix.gz -o DNAme_moreLessgenes_merged_20CLL.gz
+rm *.matrix.gz
 
-# making tracks for UCSC genome browser
+plotProfile -m DNAme_moreLessgenes_merged_23CLL.gz \
+     -out $out/deeptools/DNAme_moreLessgenes_merged_23CLL.pdf \
+      --samplesLabel label_1 \
+      --plotFileFormat 'pdf'
+
+## Making tracks for UCSC genome browser
                                 
-mark=H3K36me3
+# Example for H3K27ac                               
+cd /gsc/edcc_web/CLL_rislam/H3K27ac/hg38/
+                                
+mark=H3K27ac
 for i in 1;
 do
 echo "track $mark"
@@ -85,15 +112,10 @@ echo "        " "autoScale on"
 echo "        " "alwaysZero on"
 echo "        " "priority 0.1"
 echo "        " "bigDataUrl $f"
-echo "        " "color 153,0,153"
+echo "        " "color 0,0,255"
 echo "        " ""
 done 
 done >trackDb.txt
-
-#link hubs
-http://www.epigenomes.ca/data/CLL_rislam/H3K36me3/hub.txt 
-
-# Differential ChIP-seq regions were called using an in-house pipeline. The method is described in chapter 4.
 ```
 
 #### RNA-seq data analysis
@@ -124,17 +146,39 @@ OUTPUT: coverage files and coverage distributions; note that for strand specific
 samtools view -h <SortedDupedBAMfile> | grep -e "^@\|ZB:Z:CT" | $samtools view -ubS - | $samtools sort - <FileName>.<species>.CT
 samtools view -h <SortedDupedBAMfile> | grep -e "^@\|ZB:Z:GA" | $samtools view -ubS - | $samtools sort - <FileName>.<species>.GA
 
-# Running samtools mpileup
+## Running samtools mpileup
 samtools mpileup -BC 0 -q 30 -f <PathToReferenceGenomeFastaFile> <FileName>.<species>.CT.bam <FileName>.<species>.GA.bam | gzip -c > <FileName>.<species>.mpileup.txt.gz
 
-# Running Novomethyl (for human and lambda spike in control)
+## Running Novomethyl (for human and lambda spike in control)
 gunzip -c <FileName>.<species>.mpileup.txt.gz | <PathToNovomethyl> -o Consensus -% 2> <FileName>.<species>.methylation.log |gzip -c > <FileName>.<species>.Cmethyl.cons.bed.gz
 
-# The last lines of the methylation log file shows the estimated bisulfite conversion rate.
+## The last lines of the methylation log file shows the estimated bisulfite conversion rate.
 tail -2 output_filename.methylation.log
 
-# run Novo5mc 
+## run Novo5mc 
 java -jar -Xmx10G Novo5mC.jar -bam file.bam -out /path/  -genome $human_ref -q5 -F 1540 -minCoverage 3 -name output_filename -samtools samtools -regions 1 > /desired/path/to/your/log/file.log
 
 OUTPUT: This generates a file bearing the information of number of reads were conver or unconverted follwoing bisulfite conversion.
+
+## calculate avg methylation of genomic features
+
+bed=H3K27ac_CLL_enriched_over_others_4col.bed
+map=/path/map_5col_CpG_files/ #wgbs
+
+for cpg in $map/*.CpG.bed; 
+do
+    echo $cpg;
+    outfile=$(basename $cpg .bed);
+    echo $outfile;
+    echo $bed;
+    bedmap --echo --mean $bed $cpg | awk '{print $4}' | awk -F"|" '{print $2}' >$outfile.dname;
+done 
+
+# add rowname
+less $bed | awk '{print $1"_"$2"_"$3}' >A.dname
+
+# make table
+((echo *.dname |tr ' ' '\t') && (paste *.dname)) >H3K27ac_CLL_enriched_over_others_dname.tsv
+
+rm *.dname
 ```
