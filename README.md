@@ -36,7 +36,10 @@ R -e "install.packages('tidyverse', repos='http://cran.r-project.org', dependenc
 In a Linux/Unix terminal, run the command to generate plots. This will create .md and .html files that include the scripts and resulting plots.
 
 ```
-cd docs
+# Clone the repo
+git clone https://github.com/Rashedul/bcell_cll_epigenomes.git
+cd ./bcell_cll_epigenomes/docs
+
 Rscript -e "rmarkdown::render('index.Rmd', output_format = 'all')"
 ```
 

@@ -19,15 +19,20 @@ Jaguar 1.7.5
 #### Alignment of short-reads
 
 ```
-# index genome
+## index genome
 bwa index reference_genome.fa
 
-# align reads, convert sam to bam file and sort by coordinates
+## align reads, convert sam to bam file and sort by coordinates
+# Paired-end libs
 bwa mem -t 24 bwa_genome_index file_R1.fastq file_R2.fastq | sambamba view -S -h -f bam -t 24 /dev/stdin | sambamba sort -t 24 --tmpdir=/path/ /dev/stdin -o /outpath/file.sorted.bam
 
-# mark duplicated reads
+# Single-end libs
+bwa mem -t 24 bwa_genome_index file_R1.fastq | sambamba view -S -h -f bam -t 24 /dev/stdin | sambamba sort -t 24 --tmpdir=/path/ /dev/stdin -o /outpath/file.sorted.bam
+
+## mark duplicated reads
 java -jar -Xmx10G MarkDuplicates.jar I=file.sorted.bam O=file.sorted.dups_marked.bam M=dups AS=true VALIDATION_STRINGENCY=LENIENT QUIET=true
 ```
+
 #### ChIP-seq data analysis
 
 ```
@@ -51,7 +56,7 @@ do echo $f;
 bamCoverage -b $f -o ../bigwig_RPKM_norm_50bp/$f.bw -of bigwig -bs 50 --effectiveGenomeSize 2913022398 --normalizeUsing RPKM --extendReads --ignoreDuplicates -p max/2;
 done
 
-# HOMER motif finding
+## HOMER motif finding
 findMotifsGenome.pl regionOfInterest.bed hg38 ./ size 200 -len 8 -p 16  
 
 ## Generate profile plot my merging samples
@@ -128,12 +133,12 @@ jaguar_ref=/path/ref.fa
 bwa mem -M -P -t 24 $jaguar_ref <FQ1> <FQ2>  | sambamba_v0.5.5 view -S -h -f bam -t 16 /dev/stdin | sambamba_v0.5.5 sort -t 16 -n /dev/stdin -o <BAM>
 
 # Run repositioning by Jaguar. RunJR.sh is an in-house script
-# Example of command with hg19v69
-RunJR.sh $out/$lib".sortedByName.bam" $out/j hg19_ens69
+# Example of command with hg38v79
+RunJR.sh $out/$lib".sortedByName.bam" $out/j hg38_ens79
 
 # RNAseq master (in-house) 
 # RNAseqMaster.sh is the master script to run number of tools and generate an extensive QC report and RPKM matrix.
-RNAseqMaster.sh <1: bam file (long path)> <2: name> <3: folder with all output (will be this PATH/name)> <4: species (hg19v66/...)> <5: strand specific(S)/regular(R)> <6: quality threshold> <7: running mask COVERAGE,RPKM,LEAKAGE,PROFILE,REPORT (1==run, 0==don't run))> <8: path to resource folder, e.g. /project/epigenomics/resources/> [<9: java>] [<10: java max heap space>
+RNAseqMaster.sh <1: bam file (long path)> <2: name> <3: folder with all output (will be this PATH/name)> <4: species (hg38v79/...)> <5: strand specific(S)/regular(R)> <6: quality threshold> <7: running mask COVERAGE,RPKM,LEAKAGE,PROFILE,REPORT (1==run, 0==don't run))> <8: path to resource folder, e.g. /project/epigenomics/resources/> [<9: java>] [<10: java max heap space>
  
 OUTPUT: coverage files and coverage distributions; note that for strand specific RNA-seq coverages are calculated for proper strand and then cat together
 ```
