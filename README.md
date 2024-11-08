@@ -50,13 +50,13 @@ Rscript -e "rmarkdown::render('index.Rmd', output_format = 'all')"
 
 diffER identifies differential enrichment of ChIP-seq peaks between two groups.
 
-- Please find the diffER pipeline [here](https://github.com/Rashedul/diffER)
+- Find the diffER pipeline [here](https://github.com/Rashedul/diffER)
 
 ### 5. CRIS pipeline 
 
 CRIS uses RNA-seq data to detect perccentage of somatic hypermutations of IGHV genes to classify CLL cases into uCLL and mCLL.
 
-- Please find the CRIS pipeline [here](https://github.com/Rashedul/CRIS)
+- Find the CRIS pipeline [here](https://github.com/Rashedul/CRIS)
 
 ### 6. Citation 
 Islam R. et al., Integrative analysis of aberrant epigenomic landscape in chronic lymphocytic leukemia, (2024).
