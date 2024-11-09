@@ -23,7 +23,7 @@ In a Linux/Unix terminal, execute the following commands to create an R environm
 # Install packages from conda
 conda create -n renv r-base -y
 conda activate renv
-conda install -c conda-forge -y r-ggplot2 r-dplyr
+conda install -c conda-forge -y r-ggplot2 r-dplyr r-pandoc
 
 # Install packages outside of conda
 
