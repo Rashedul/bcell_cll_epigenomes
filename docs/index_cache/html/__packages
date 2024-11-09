@@ -15,3 +15,6 @@ circlize
 UpSetR
 data.table
 patchwork
+survival
+ggpubr
+survminer

@@ -21,6 +21,9 @@ library(pheatmap)
 library(circlize)
 library(UpSetR)
 library(data.table)
+library(parallel)
+library(survival)
+library(survminer)
 ```
 
 
@@ -1046,24 +1049,314 @@ gene_expression("BCL2")
 
 ### Figure 3.
 
-#### 2C
+#### 3A
 
 
-#### 1C
+```r
+x = read.table("../data/AvgMeth_H3K27ac_CLL_enriched_over4cell_0.75percent.txt")
+x = x %>%
+  filter(!grepl("shuffle", V2)) %>% 
+  select(-V2) %>%
+  mutate(type = "Enh_met")
+colnames(x) = c("id", "met", "type")
+
+y = read.table("../data/avgMetGenomeWide_53samples_v2.txt")
+y = y %>%
+  mutate(type = "global")
+colnames(y) = c("id", "met", "type")
+y$id <- gsub('.bed', '', y$id)
+
+df = rbind(x,y)
+
+df = df %>% 
+  filter(!grepl("EGAN00001286337", id)) %>% 
+  filter(!grepl("CLL_29", id)) 
+
+df$id <- gsub('.bed.combine.5mC.CpG', '', df$id)
+df$id <- gsub('.combine.5mC.CpG', '', df$id)
+
+ucll = c("EGAN00001343492:CLL.12:12CLL", "EGAN00001343490:CLL.182:182CLL", "CLL_95", "CLL_30",  "CLL_27", "CLL_29", "CLL_4")
+
+df$Cell <- ifelse(df$id %in% ucll, "uCLL",
+                  ifelse(grepl("GCBC", df$id, ignore.case = T), "GCBC", 
+                         ifelse(grepl("csMBC", df$id, ignore.case = T), "MBC", 
+                                ifelse(grepl("HMPC", df$id, ignore.case = T), "HMPC",
+                                       ifelse(grepl("NBC", df$id, ignore.case = T), "NBC",
+                                              ifelse(grepl("PBC", df$id, ignore.case = T), "PBC",
+                                                     ifelse(grepl("PreBC", df$id, ignore.case = T), "PreBC",
+                                                            ifelse(grepl("MBC", df$id, ignore.case = T), "MBC", "mCLL"))))))))
+
+df$Cell = factor(df$Cell, levels = c("HMPC","PreBC" , "NBC", "GCBC", "MBC", "PBC", "uCLL", "mCLL"))
+
+df %>%
+  ggplot(aes(Cell, met)) +
+  geom_dotplot(aes(fill = type, color = NA), binaxis = "y", stackdir = "center", stackratio = .5, position = "dodge", dotsize = .5, alpha = .7) +
+  geom_boxplot(aes(color = type), alpha = .1) +
+  scale_color_manual(values = c("#c51b8a", "black")) +
+  scale_fill_manual(values = c("#c51b8a", "black")) +
+  xlab("") +
+  ylab("Average methylation") +
+  theme_bw() +
+  theme(panel.background = element_rect(fill = "white"),
+        panel.border = element_rect(fill = NA, colour = "gray", size = 1),
+        strip.background =element_rect(fill="white"),
+        axis.text = element_text(color = "black"),
+        legend.position = "bottom")
+```
+
+![](../plots/3A-1.png)<!-- -->
+
+#### 3B
 
 
-#### 1C
+```r
+xy = read_tsv("../data/cpg_CLL_enh.DNAMe.txt")
+
+ucll = c("EGAN00001343492:CLL.12:12CLL", "EGAN00001343490:CLL.182:182CLL", "CLL_95", "CLL_30", "CLL_30.large", "CLL_30.small", "CLL_27", "CLL_29", "CLL_4")
+mcll = c( "CLL.110", "CLL.1228",  "CLL.1525", "CLL.1532",  "CLL.3", "CLL_97", "CLL_93", "CLL_96", "CLL_94", "CLL_6", "CLL_28", "CLL_5", "CLL_26", "CLL_25",  "CLL_1")
+low = c("PreBC", "NBC", "HMPC")
+high = c("GCBC", "MBC", "PBC")
+
+uCLL = xy %>% select(contains(ucll)) %>% mutate(mean = rowMeans(.))
+mCLL = xy %>% select(contains(mcll)) %>% mutate(mean = rowMeans(.))
+Low = xy %>% select(contains(low)) %>% mutate(mean = rowMeans(.))
+High = xy %>% select(contains(high)) %>% mutate(mean = rowMeans(.))
+
+#fc
+df = data.frame(A.ID = xy$A.ID, lh = log2(Low$mean / (High$mean+0.001)), um = log2(uCLL$mean / (mCLL$mean+0.001))) 
+df$type <- with(df, ifelse(um <= -1, 'Win',
+                           ifelse(um >=1, 'Loss', 'Stable')))
+temp = df %>% filter(type == "Win") %>% select(A.ID)
+
+ggplot(df) +
+  geom_point(aes(lh, um, color = type, size=1, shape=".")) +
+  geom_point(data = subset(df, type == 'enh'),
+             aes(lh, um, color = type, size=1, shape=".")) +
+  scale_shape_manual(values=c(".")) +
+  scale_color_manual(values = c( 'blue' ,'#c6c6c6', '#c51b8a')) + # was 'c('red', '#bdbdbd')'
+  xlim(-6, 6) +
+  ylim(-6, 6) +
+  xlab("log2(PreGC/postGC)") +
+  ylab("log2(uCLL/mCLL)") + 
+  geom_hline(yintercept = c(0), color = "black") +
+  geom_vline(xintercept = c(0), color = "black") +
+  geom_hline(yintercept = c(-1,1), color = "gray") +
+  geom_vline(xintercept = c(-1,1), color = "gray") +
+  theme(panel.background = element_rect(fill = "white"),
+        panel.border = element_rect(fill = NA, colour = "gray", size = 1),
+        strip.background =element_rect(fill="white"),
+        axis.text = element_text(color = "black"),
+        legend.position = "none") +
+  theme(text = element_text(size = 24))
+```
+
+![](../plots/3B-1.png)<!-- -->
+
+#### 3C
 
 
-#### 1C
+```r
+x = read_tsv("../data/cpg_CLL_enh.DN.DNAMe.txt")
+x = x %>% na.omit() %>% select(-contains("small")) %>% select(-contains("large")) 
+
+colnames(x) <- gsub('.bed.combine.5mC.CpG.NA_id.methValue', '', colnames(x))
+
+ucll = c("EGAN00001343492:CLL.12:12CLL", "EGAN00001343490:CLL.182:182CLL", "CLL_95", "CLL_30", "CLL_30.large", "CLL_30.small", "CLL_27", "CLL_29", "CLL_4")
+mcll = c( "CLL.110", "CLL.1228",  "CLL.1525", "CLL.1532",  "CLL.3", "CLL_97", "CLL_93", "CLL_96", "CLL_94", "CLL_6", "CLL_28", "CLL_5", "CLL_26", "CLL_25",  "CLL_1")
+
+uCLL = x %>% select(contains(ucll)) 
+mCLL = x %>% select(contains(mcll))
+df = cbind(uCLL, mCLL)
+
+anno = data.frame(IGHV = c("uCLL", "uCLL", "uCLL", "uCLL", "uCLL", "uCLL", "mCLL",  "mCLL",  "mCLL",  "mCLL", "mCLL", "mCLL", "mCLL" , "mCLL",  "mCLL",  "mCLL",  "mCLL", "mCLL"))
+annot_colors=list(IGHV=c(uCLL="#F59EB5",mCLL="#C61D8A"))
+
+rownames(anno) = colnames(df)
+
+pheatmap(df, show_rownames = F, 
+         cutree_cols = 2, 
+         show_colnames = F, 
+         annotation_col = anno,
+         annotation_colors = annot_colors,
+         cluster_cols = T,
+         cluster_rows = T,
+         treeheight_row = 0,
+         clustering_method = "ward.D2")
+```
+
+![](../plots/3C-1.png)<!-- -->
+
+```r
+#bcell
+HMPC = x %>% select(contains("HMPC"))
+PreBC = x %>% select(contains("PreBC"))
+NBC = x %>% select(contains("NBC"))
+
+GCBC = x %>% select(contains("GCBC"))
+MBC = x %>% select(contains("MBC"))
+PBC = x %>% select(contains("PBC"))
+
+df2 = cbind(HMPC, PreBC, NBC, GCBC, MBC, PBC)
+
+anno2 = data.frame(Cell = c("HMPC", "HMPC", "PreBC", "PreBC", "NBC", "NBC",  "NBC",  "NBC",  "NBC", "NBC", "GCBC", "GCBC" , "GCBC",  "GCBC",  "GCBC",  "GCBC", "GCBC" , "GCBC", "GCBC", "MBC", "MBC", "MBC", "MBC", "MBC", "PBC", "PBC", "PBC", "PBC", "PBC"))
+annot_colors2=list(Cell=c(HMPC="#f0f0f0",PreBC="#bdbdbd",NBC="#636363",GCBC="#35B779FF", MBC="#26828EFF",PBC="#3E4A89FF"))
+rownames(anno2) = colnames(df2)
+
+pheatmap(df2, show_rownames = F,
+         cutree_cols = 2,
+         show_colnames = F, 
+         annotation_col = anno2,
+         annotation_colors = annot_colors2,
+         cluster_cols = T,
+         cluster_rows = T,
+         treeheight_row = 0,
+         clustering_method = "ward.D2")
+```
+
+![](../plots/3C-2.png)<!-- -->
+
+#### 3D
 
 
-#### 1C
+```r
+# input file is too big to load on github and phs000435.v3 metadata can not be shared publicly. The data can be shared upon request.
+clust <- makeCluster(4)
+x = fread("../data/cpg_CLL_enh.DN.DNAMe.txt", nThread = 4)[,1]
+colnames(x) = "A.ID.idval"
+rrbs = read.table("../data/table_rrbs_subset.tsv", header = T) # this file is too big to load on github
+colnames(rrbs) <- gsub('.dupsFlagged.q5.5mC.CpG.gz.ombine.5mC.CpG.bed.idval', '', colnames(rrbs))
+colnames(rrbs) <- gsub('.1.ombine.5mC.CpG.bed.idval', '', colnames(rrbs))
+colnames(rrbs) <- gsub('DFCI_', 'DFCI-', colnames(rrbs))
+colnames(rrbs)
+
+stopCluster(clust)
+
+# get dn cpg
+rrbs2 = merge(rrbs, x)
+rrbs2[rrbs2 == -1] <- NA
+
+# get cpgs with NA in <= 50% of samples
+threshold <- ncol(rrbs2) / 2
+df_filtered <- rrbs2[rowSums(is.na(rrbs2)) <= threshold, ]
+
+#
+pheatmap(df_filtered[,2:117], show_rownames = F,
+         cutree_cols = 2,
+         show_colnames = F, 
+         #annotation_col = anno2,
+         #annotation_colors = annot_colors2,
+         cluster_cols = T,
+         cluster_rows = T,
+         treeheight_row = 0,
+         na_col = "black",
+         clustering_method = "ward.D2")
+```
+
+#### 3E
 
 
-#### 1C
+```r
+x = read.table("../data/2016.02.23_qCEMT_patient_sample_info_Joseph_Connors.csv", sep = ",", head = T)
+
+os = x %>% filter(Enh_met != "") %>% filter(!grepl("CEMT_30", StudySubCode)) 
+
+fit <- survfit(Surv(Progression.free.survival..y., treatment_at_epi) ~ Enh_met, data = os)
+
+#calculate p-value
+surv_pvalue(
+  fit,
+  data = NULL,
+  method = "FH_p=1_q=1",
+  test.for.trend = FALSE,
+  combine = FALSE
+)
+```
+
+```
+##   variable   pval                        method  pval.txt
+## 1  Enh_met 0.0426 Fleming-Harrington (p=1, q=1) p = 0.043
+```
+
+```r
+ggsurvplot(fit,
+           pval = F, conf.int = F,
+           risk.table = F, 
+           risk.table.col = "strata", 
+           ggtheme = theme_bw(), 
+           palette = c("red", "blue"))
+```
+
+![](../plots/3E-1.png)<!-- -->
+
+#### 3F
 
 
+```r
+x = read.table("../data/known1.motif.bed.H3K27ac_DE.bed.profileMean_all_54lib", sep = '\t', head = T)
+x2 = melt(x)
+x2$motif = rep("NFAT", nrow(x))
+nfat = x2 %>% mutate(axis = rep(c((40:1)*-50, 0, (1:39)*50), ncol(x)))
+
+x = read.table("../data/known2.motif.bed.H3K27ac_DE.bed.profileMean_all_54lib", sep = '\t', head = T)
+x2 = melt(x)
+x2$motif = rep("EGR2", nrow(x))
+egr2 = x2 %>% mutate(axis = rep(c((40:1)*-50, 0, (1:39)*50), ncol(x)))
+
+x = read.table("../data/known3.motif.bed.H3K27ac_DE.bed.profileMean_all_54lib", sep = '\t', head = T)
+x2 = melt(x)
+x2$motif = rep("IRF8", nrow(x))
+irf8 = x2 %>% mutate(axis = rep(c((40:1)*-50, 0, (1:39)*50), ncol(x)))
+
+x = read.table("../data/known4.motif.bed.H3K27ac_DE.bed.profileMean_all_54lib", sep = '\t', head = T)
+x2 = melt(x)
+x2$motif = rep("bZIP28", nrow(x))
+bzip28 = x2 %>% mutate(axis = rep(c((40:1)*-50, 0, (1:39)*50), ncol(x)))
+
+df = rbind(nfat, egr2, irf8, bzip28) 
+df$variable <- gsub('.bed.combine.5mC.CpG.bedGraph.bw.profileMean', '', df$variable) 
+
+low = c("CLL_94", "EGAN00001358480.CLL.1532.1532CLL", "CLL_5", "CLL_97", "CLL_95", "CLL_30", "CLL_27", "CLL_4", "EGAN00001343492.CLL.12.12CLL", "EGAN00001343490.CLL.182.182CLL")
+high = c("CLL_96", "CLL_25", "CLL_28", "EGAN00001401801.CLL.1228.1228CLL", "EGAN00001358479.CLL.1525.1525CLL", "CLL_6", "EGAN00001343494.CLL.110.110CLL", "CLL_26")
+
+df$Cell <- ifelse(df$variable %in% low, "Low",
+                  ifelse(df$variable %in% high, "High",
+                         ifelse(grepl("GCBC", df$variable, ignore.case = T), "GCBC", 
+                                ifelse(grepl("csMBC", df$variable, ignore.case = T), "MBC", 
+                                       ifelse(grepl("HMPC", df$variable, ignore.case = T), "HMPC",
+                                              ifelse(grepl("NBC", df$variable, ignore.case = T), "NBC",
+                                                     ifelse(grepl("PBC", df$variable, ignore.case = T), "PBC",
+                                                            ifelse(grepl("PreBC", df$variable, ignore.case = T), "PreBC",
+                                                                   ifelse(grepl("MBC", df$variable, ignore.case = T), "MBC", "other")))))))))
+
+#remove cemt_30 large and small
+df = df %>% na.omit()
+
+df2 = df %>%
+  filter(variable !="CLL_28.large") %>%
+  filter(variable !="CLL_28.small") %>%
+  filter(variable !="CLL_30.large") %>%
+  filter(variable !="CLL_30.small") %>%
+  filter(variable != "EGAN00001286337.NBC.6.NC11_83") %>%
+  filter(variable != "CLL_29") %>% 
+  filter(variable != "EGAN00001235812.MBC.2.csMBC")
+
+df2$Cell = factor(df2$Cell, levels = c("HMPC","PreBC" , "NBC", "GCBC", "MBC", "PBC", "Low", "High"))
+df2$motif = factor(df2$motif, levels = c("NFAT", "EGR2", "IRF8", "bZIP28"))
+
+ggplot(df2, aes(axis, value, group = variable, color = Cell)) +
+  geom_smooth(se = F) +
+  scale_color_manual(values=c("#bdbdbd", "#636363", "black", "#35B779FF", "#26828EFF", "#3E4A89FF", "#3182bd", "#c51b8a" )) +
+  facet_grid(~motif) +
+  xlab("") +
+  ylab("Methylation") +
+  theme(panel.background = element_rect(fill = "white"),
+        panel.border = element_rect(fill = NA, colour = "gray", size = .5),
+        strip.background =element_rect(fill="white"),
+        axis.text = element_text(color = "black", angle = 0, hjust = 1),
+        legend.position = "bottom")
+```
+
+![](../plots/unnamed-chunk-3-1.png)<!-- -->
 
 ### Figure 4.
 
@@ -1176,7 +1469,7 @@ df %>%
         axis.text = element_text(color = "black", angle = 90, vjust = 0.5, hjust=1))
 ```
 
-![](../plots/unnamed-chunk-9-1.png)<!-- -->
+![](../plots/unnamed-chunk-4-1.png)<!-- -->
 
 #### 4F
 
@@ -1256,7 +1549,7 @@ df %>%
 gene_expression("GGA3")
 ```
 
-![](../plots/unnamed-chunk-10-1.png)<!-- -->
+![](../plots/unnamed-chunk-5-1.png)<!-- -->
 
 #### S4D
 
@@ -1286,7 +1579,7 @@ hl %>%
         axis.text = element_text(color = "black", angle = 0, vjust = 0.5, hjust=1)) 
 ```
 
-![](../plots/unnamed-chunk-11-1.png)<!-- -->
+![](../plots/unnamed-chunk-6-1.png)<!-- -->
 
 ### Figure S2
 
@@ -1346,7 +1639,7 @@ xm2 %>%
   guides(y = "none")
 ```
 
-![](../plots/unnamed-chunk-12-1.png)<!-- -->
+![](../plots/unnamed-chunk-7-1.png)<!-- -->
 
 #### S2I
 
@@ -1404,10 +1697,46 @@ xm2 %>%
   guides(y = "none")
 ```
 
-![](../plots/unnamed-chunk-13-1.png)<!-- -->
+![](../plots/unnamed-chunk-8-1.png)<!-- -->
 
 ### Figure S3
 
 #### S3
 
 
+
+#### S3D
+
+
+```r
+x = read.table("../data/2016.02.23_qCEMT_patient_sample_info_Joseph_Connors.csv", sep = ",", head = T)
+
+os = x %>% filter(Enh_met != "") %>% filter(!grepl("CEMT_30", StudySubCode)) 
+
+fit <- survfit(Surv(Progression.free.survival..y., treatment_at_epi) ~ IGHV, data = os)
+
+#calculate p-value
+surv_pvalue(
+  fit,
+  data = NULL,
+  method = "FH_p=1_q=1",
+  test.for.trend = FALSE,
+  combine = FALSE
+)
+```
+
+```
+##   variable   pval                        method pval.txt
+## 1     IGHV 0.2635 Fleming-Harrington (p=1, q=1) p = 0.26
+```
+
+```r
+ggsurvplot(fit,
+           pval = F, conf.int = F,
+           risk.table = F, 
+           risk.table.col = "strata",
+           ggtheme = theme_bw(), 
+           palette = c("red", "blue"))
+```
+
+![](../plots/S3D-1.png)<!-- -->
