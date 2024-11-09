@@ -12,6 +12,7 @@ bedtools 2.29.0
 macs2 2.1.1.20160309
 finder 2
 Jaguar 1.7.5
+BEDOPS 2.4.41
 ```
 
 ### Pseudocode of pipelines

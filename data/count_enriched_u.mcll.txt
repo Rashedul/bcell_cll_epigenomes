@@ -1,0 +1,12 @@
+-70	H3K27ac	mutated
+847	H3K27ac	unmutated
+-11610	H3K27me3	mutated
+1707	H3K27me3	unmutated
+-434	H3K36me3	mutated
+1418	H3K36me3	unmutated
+-1759	H3K4me1	mutated
+987	H3K4me1	unmutated
+-74	H3K4me3	mutated
+219	H3K4me3	unmutated
+-19490	H3K9me3	mutated
+210	H3K9me3	unmutated

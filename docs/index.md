@@ -24,6 +24,8 @@ library(data.table)
 library(parallel)
 library(survival)
 library(survminer)
+#library(matrixStats)
+library(ggrepel)
 ```
 
 
@@ -74,9 +76,9 @@ gene_expression = function(geneName)
 }
 ```
 
-### Figure 1.
+### Figure 1: Epigenomic signatures segregate B-cell lineages and Gain of H3K4me1 is associated with oncogenic pathways in CLL.
 
-#### 1C
+#### 1C. Principal component analysis (PCA) of features.
 
 
 ```r
@@ -611,7 +613,7 @@ library(patchwork)
 
 ![](../plots/1C-1.png)<!-- -->
 
-#### 1D
+#### 1D. Dynamic H3k4me1 enrichment acorss cell types.
 
 
 ```r
@@ -685,7 +687,7 @@ pheatmap(x2,
 
 ![](../plots/1D-1.png)<!-- -->
 
-#### 1F
+#### 1F. Expression of LEF1.
 
 
 ```r
@@ -694,7 +696,7 @@ gene_expression("LEF1")
 
 ![](../plots/1F-1.png)<!-- -->
 
-#### 1G
+#### 1G. Expression of LEF1-targets and non-targets.
 
 
 ```r
@@ -729,9 +731,9 @@ rbind(e2, e3) %>%
 
 ![](../plots/unnamed-chunk-1-1.png)<!-- -->
 
-### Figure 2.
+### Figure 2: Active CLL enhancers are primed in B-cell and associated with CLL super-enhancers
 
-#### 2A
+#### 2A. Heatmap of active CLL enhancers.
 
 
 ```r
@@ -774,7 +776,7 @@ pheatmap(x3,
 
 ![](../plots/2A-1.png)<!-- -->
 
-#### 2B
+#### 2B. H3K4me1 and DNAme at active CLL enhancers.
 
 
 ```r
@@ -913,7 +915,7 @@ xm2 %>%
 
 ![](../plots/2B-2.png)<!-- -->
 
-#### 2C
+#### 2C. Super-enhancer associted genes upregulated in CLL.
 
 
 ```r
@@ -981,7 +983,7 @@ pheatmap(log(x2+0.001),
 
 ![](../plots/2C-1.png)<!-- -->
 
-#### 2E
+#### 2E. DNAme at BCL2 enhancers.
 
 
 ```r
@@ -1038,7 +1040,7 @@ xm2 %>%
 
 ![](../plots/2E-1.png)<!-- -->
 
-#### 1F
+#### 1F. BCL2 expression. 
 
 
 ```r
@@ -1047,9 +1049,9 @@ gene_expression("BCL2")
 
 ![](../plots/unnamed-chunk-2-1.png)<!-- -->
 
-### Figure 3.
+### Figure 3: Development independent DNAme signatures at the enhancers stratifies CLL.
 
-#### 3A
+#### 3A. Genome-wide and enhancer DNAme.
 
 
 ```r
@@ -1106,7 +1108,7 @@ df %>%
 
 ![](../plots/3A-1.png)<!-- -->
 
-#### 3B
+#### 3B. Enhancer DNAme change.
 
 
 ```r
@@ -1152,7 +1154,7 @@ ggplot(df) +
 
 ![](../plots/3B-1.png)<!-- -->
 
-#### 3C
+#### 3C. Clustering based on enhancer DNAme.
 
 
 ```r
@@ -1215,7 +1217,7 @@ pheatmap(df2, show_rownames = F,
 
 ![](../plots/3C-2.png)<!-- -->
 
-#### 3D
+#### 3D. Clustering based on enhancer DNAme in DFCI cohort.
 
 
 ```r
@@ -1252,7 +1254,7 @@ pheatmap(df_filtered[,2:117], show_rownames = F,
          clustering_method = "ward.D2")
 ```
 
-#### 3E
+#### 3E. CEMT progression free survival.
 
 
 ```r
@@ -1288,7 +1290,7 @@ ggsurvplot(fit,
 
 ![](../plots/3E-1.png)<!-- -->
 
-#### 3F
+#### 3F. DNAme at motifs.
 
 
 ```r
@@ -1358,9 +1360,9 @@ ggplot(df2, aes(axis, value, group = variable, color = Cell)) +
 
 ![](../plots/unnamed-chunk-3-1.png)<!-- -->
 
-### Figure 4.
+### Figure 4: Reduced H3K36me3 is coupled with genebody hypomethylation in CLL.
 
-#### 4B
+#### 4B. Intersection of hypomethylated CpGs.
 
 
 ```r
@@ -1389,7 +1391,8 @@ upset(x, sets = c("High-mCLL", "High-uCLL", "Low-High",  "Low-mCLL",  "Low-uCLL"
 ```
 
 ![](../plots/4B-1.png)<!-- -->
-#### 4C
+
+#### 4C. HMR heatmap.
 
 
 ```r
@@ -1410,7 +1413,7 @@ pheatmap(x4, border_color = NA, show_rownames = F, show_colnames = F, fontsize =
 
 ![](../plots/4C-1.png)<!-- -->
 
-#### 4D
+#### 4D. Profile at hypo-CpGs.
 
 
 ```r
@@ -1440,9 +1443,9 @@ ggplot(aes(x, value, color = Type)) +
         axis.text = element_text(color = "black", angle = 90, vjust = 0.5, hjust=1))
 ```
 
-![](../plots/4d-1.png)<!-- -->
+![](../plots/4D-1.png)<!-- -->
 
-#### 4E
+#### 4E. CpG density. 
 
 
 ```r
@@ -1469,9 +1472,9 @@ df %>%
         axis.text = element_text(color = "black", angle = 90, vjust = 0.5, hjust=1))
 ```
 
-![](../plots/unnamed-chunk-4-1.png)<!-- -->
+![](../plots/4E-1.png)<!-- -->
 
-#### 4F
+#### 4F. DNAme and H3K36me3 at low and high CpG density regions.
 
 
 ```r
@@ -1542,14 +1545,497 @@ df %>%
 
 ![](../plots/4F-2.png)<!-- -->
 
-#### 4G
+#### 4G. GGA3 expression.
 
 
 ```r
 gene_expression("GGA3")
 ```
 
-![](../plots/unnamed-chunk-5-1.png)<!-- -->
+![](../plots/4G-1.png)<!-- -->
+
+### Figure 5: Major CLL subtypes have distinct H3K27me3 landscapes
+
+#### 5A. Count of differentially enriched regions. 
+
+
+```r
+x = read.table("../data/count_enriched_u.mcll.txt")
+x$V2 = factor(x$V2, levels = c("H3K4me1", "H3K4me3", "H3K36me3", "H3K27ac",  "H3K27me3", "H3K9me3"))
+y = read.table("../data/count_enriched_notch1_wt_delct.txt")
+y$V2 = factor(y$V2, levels = c("H3K4me1", "H3K4me3", "H3K36me3", "H3K27ac",  "H3K27me3", "H3K9me3"))
+
+rbind(x,y) %>% 
+  mutate(type = ifelse(grepl("mutated", V3), "IGHV-subtype", "NOTCH1-subtype")) %>%
+  filter(V2 != "H3K9me3") %>% 
+  ggplot(aes(V2, abs(V1), fill = V3)) +
+  geom_bar(stat = "identity", position="dodge") + 
+  xlab("") +
+  ylab("Number of enriched regions") +
+  facet_grid(type~., scales = "free") +
+  scale_fill_manual(values = c("#31a354", "#c51b8a", "#fa9fb5", "#636363")) +
+  theme(panel.background = element_rect(fill = "white"),
+        panel.border = element_rect(fill = NA, colour = "gray", size = 1),
+        strip.background =element_rect(fill="white"),
+        axis.text = element_text(color = "black", angle = 90, vjust = 0.5, hjust=1))
+```
+
+![](../plots/5A-1.png)<!-- -->
+
+#### 5B. H3K27me3 heatmaps of subtypes.
+
+
+```r
+# heatmap function IGHV subtypes
+u = c("CEMT_92", "CEMT_95", "CEMT_30", "CEMT_27", "CEMT_29", "CEMT_4", "EGAN00001202788", "EGAN00001202787")
+m = c("CEMT_97", "CEMT_93", "CEMT_96", "CEMT_94", "CEMT_6", "CEMT_28", "CEMT_5", "CEMT_26", "CEMT_25",  "CEMT_1", "EGAN00001202789",  "EGAN00001265750", "EGAN00001295796", "EGAN00001235813", "EGAN00001202786")
+
+plot_heatmap <- function(gain, loss, length, mark) {
+  x = gain %>% select(-contains("MACS2NoInput")) 
+  y = loss %>% select(-contains("MACS2NoInput")) 
+  xy = rbind(x,y) 
+  
+  ucll = xy %>% select(contains(u)) # R function does not work in this step
+  mcll = xy %>% select(contains(m)) %>% select(-contains("CEMT_129"), -contains("CEMT_13")) #gcbc
+  
+  x2 = cbind(ucll,mcll)
+  anno = data.frame("Cell" = c(rep("uCLL",ncol(ucll)),rep("mCLL",ncol(mcll))))
+  rownames(anno) = colnames(x2)
+  
+  pheatmap(x2/length, 
+           color = colorRampPalette(c("#ece2f0", "#a6bddb", "#1c9099"))(100), 
+           annotation_col = anno, 
+           cluster_rows = F, 
+           cluster_cols = F, 
+           show_rownames = F, 
+           show_colnames = F, 
+           gaps_col = ncol(x2)-ncol(mcll), 
+           gaps_row = nrow(x2)-nrow(y), 
+           main = mark)
+}
+
+# H3K27me3
+x = read_tsv("../data/H3K27me3.mCLL_uCLL_unmutated_enriched_matirx.tsv")
+y = read_tsv("../data/H3K27me3.mCLL_uCLL_mutated_enriched_matirx.tsv")
+x2 = rbind(x,y)
+len = data.frame(str_split_fixed(x2$A.H3K27me3.intersect.value, "_", 3)) 
+len2 = as.numeric(as.character(len$X3)) - as.numeric(as.character(len$X2))
+plot_heatmap(x, y, len2, "CLL IGHV subtypes (H3K27me3)")
+```
+
+![](../plots/5B-1.png)<!-- -->
+
+```r
+# heatmap function for notch1
+plot_heatmap <- function(gain, loss, length, mark){
+  df = rbind(gain, loss)
+  delct = df %>% 
+    select(contains("CLL")) %>% 
+    select(contains("CEMT_27"), 
+           contains("CEMT_29"), 
+           contains("EGAN00001202788"))
+  wt = df %>% 
+    select(contains("CLL")) %>% 
+    select(-contains("CEMT_27"), -contains("CEMT_29"), -contains("EGAN00001202788"))  %>%
+    select(-contains("NoInput")) %>%
+    select(-contains("CEMT_4")) # CEMT_4 is an outlier in H3K27me3 heatmap and removed 
+  
+  x2 = cbind(delct, wt)
+  anno = data.frame("Cell" = c(rep("del_CT",ncol(delct)),rep("WT",ncol(wt))))
+  rownames(anno) = colnames(x2)
+  
+  pheatmap(x2/length, 
+           annotation_col = anno,
+           color = colorRampPalette(c("#ece2f0", "#a6bddb", "#1c9099"))(100), 
+           cluster_rows = F, 
+           cluster_cols = F, 
+           show_rownames = F, 
+           show_colnames = F, 
+           #scale = "row", 
+           gaps_col = 3,
+           main = mark,
+           gaps_row = nrow(x2)-nrow(loss))
+}
+
+x = read_tsv("../data/H3K27me3.NOTCH1_wt_enriched_matirx.tsv")
+y = read_tsv("../data/H3K27me3.NOTCH1_del_CT_enriched_matirx.tsv")
+xy = rbind(x,y)
+len = data.frame(str_split_fixed(xy$A.H3K27me3.intersect.value, "_", 3)) 
+len2 = as.numeric(as.character(len$X3)) - as.numeric(as.character(len$X2))
+plot_heatmap(x, y, len2, "CLL NOTCH1 subtypes (H3K27me3)")
+```
+
+![](../plots/5B-2.png)<!-- -->
+
+#### 5C. Differentially expressed genes in IGHV subtypes.
+
+
+```r
+# de genes scatter
+up = read.table("../data/mCLL_vs_uCLL_UP.txt")
+up = rownames(up)
+dn = read.table("../data/mCLL_vs_uCLL_DN.txt")
+dn = rownames(dn)
+
+k = read.table("../data/table_EGA_CEMT.txt", head = T)
+gene = read.table("../data/hg38v79_genes", header = T)[,c(1,7)]
+
+#
+mcll = c( "CLL.110", "CLL.1228",  "CLL.1525", "CLL.1532",  "CLL.3", "CLL_97", "CLL_93", "CLL_96", "CLL_94", "CLL_6", "CLL_28", "CLL_5", "CLL_26", "CLL_25",  "CLL_1")
+ucll = c("CLL.12", "CLL.182", "CLL_92", "CLL_95", "CLL_30", "CLL_27", "CLL_29", "CLL_4")
+
+u.cll = k %>% select(ENSG, ucll) 
+u.cll2 = u.cll[,2:ncol(u.cll)] %>% as.matrix() %>% rowMeans()
+u.cll3 = data.frame(ens = u.cll$ENSG, uCLL = u.cll2)
+
+m.cll = k %>% select(ENSG, mcll) 
+m.cll2 = m.cll[,2:ncol(m.cll)] %>% as.matrix() %>% rowMeans()
+m.cll3 = data.frame(ens = m.cll$ENSG, mCLL = m.cll2)
+
+df = inner_join(u.cll3, m.cll3)
+
+df$de <- ifelse(k$ENSG %in% up, "UP", 
+                ifelse(k$ENSG %in% dn, "DN", "stable")) 
+df2 = left_join(df, gene, by = c( "ens" = "stable_id")) %>% select(-ens)
+
+# DEG IGHV
+
+ggplot(df2, aes(log10(mCLL), log10(uCLL), color = de, alpha = de)) +
+  geom_point(aes()) +
+  xlim(-5,3) +
+  ylim(-5,3) +
+  xlab("log10(RPKM[mCLL])") + 
+  ylab("log10(RPKM[uCLL])") +
+  geom_abline(color = "black") +
+  scale_color_manual(values = c('blue', '#808080', '#FF0000' )) +
+  #scale_color_manual(values = c('#F59EB5', '#808080', '#C61D8A' )) +
+  scale_alpha_manual(guide='none', values = c(1,.2,1)) +
+  theme(panel.background = element_rect(fill = "white"),
+        panel.border = element_rect(fill = NA, colour = "gray", size = 1),
+        strip.background =element_rect(fill="white"),
+        axis.text = element_text(color = "black"),
+        legend.position = "none") +
+  geom_text_repel(
+    data = subset(df2, df2$display_label %in% c("CD38", "SLC35F4", "ZNF667", "RBMS3", "PLD1", "WISP3", "WNT11", "FOXB1", "FAM84B")),
+    aes(label = display_label),
+    size = 5,
+    box.padding = unit(2, "lines"),
+    point.padding = unit(0.3, "lines"))
+```
+
+![](../plots/5C-1.png)<!-- -->
+
+#### 5D. Expression and H3K27me3 occupancy.
+
+
+```r
+k = read.table("../data/table_EGA_CEMT.txt", head = T)
+gene = read.table("../data/hg38v79_genes", header = T)[,c(1,7)]
+k2 = left_join(gene, k,  by = c( "stable_id" = "ENSG")) %>% na.omit() %>% select(-stable_id)
+xm = melt(k2)
+
+mcll = c( "CLL.110", "CLL.1228",  "CLL.1525", "CLL.1532",  "CLL.3", "CLL_97", "CLL_93", "CLL_96", "CLL_94", "CLL_6", "CLL_28", "CLL_5", "CLL_26", "CLL_25",  "CLL_1")
+ucll = c("CLL.12", "CLL.182", "CLL_92", "CLL_95", "CLL_30", "CLL_27", "CLL_29", "CLL_4")
+
+xm$Cell <- ifelse(xm$variable %in% mcll, "mCLL", 
+                  ifelse(xm$variable %in% ucll, "uCLL",
+                         ifelse(grepl("MBC", xm$variable, ignore.case = T), "MBC", 
+                                ifelse(grepl("HMPC", xm$variable, ignore.case = T), "HMPC",
+                                       ifelse(grepl("NBC", xm$variable, ignore.case = T), "NBC",
+                                              ifelse(grepl("PBC", xm$variable, ignore.case = T), "PBC",
+                                                     ifelse(grepl("PreBC", xm$variable, ignore.case = T), "PreBC", # no rna-seq data
+                                                            ifelse(grepl("GCBC", xm$variable, ignore.case = T), "GCBC", 
+                                                                   ifelse(grepl("CLP", xm$variable, ignore.case = T), "CLP", "nothing")))))))))
+
+xm2 = xm 
+xm2$Cell = factor(xm2$Cell, levels = c("HMPC", "CLP", "NBC", "GCBC", "MBC", "PBC", "uCLL", "mCLL"))
+
+xm2 = xm2 %>% filter(Cell == "uCLL" | Cell ==  "mCLL")
+
+gene_expression = function(geneName)
+{
+  plot = xm2 %>% filter(display_label == geneName) %>%
+    ggplot(aes(Cell, value, fill = Cell)) +
+    scale_fill_manual(values=c( "#fa9fb5", "#c51b8a")) +
+    geom_boxplot() +
+    geom_dotplot(binaxis = "y", stackdir = "center", stackratio = .5, dotsize = 1, fill = "black", alpha = .75) + 
+    theme_bw() +
+    ylab("RPKM") +
+    xlab(geneName) +
+    theme(panel.background = element_rect(fill = "white"),
+          panel.border = element_rect(fill = NA, colour = "gray", size = 1),
+          strip.background =element_rect(fill="white"),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          axis.text.x = element_text(color = "black", angle = 0, hjust = 1),
+          axis.text.y = element_text(color = "black", hjust = 1),
+          legend.position = "none")
+  
+  print(plot)
+  
+  u = xm2 %>% filter(display_label == geneName & Cell == "uCLL")
+  m = xm2 %>% filter(display_label == geneName & Cell == "mCLL")
+  #print(geneName)
+  #print(t.test(u$value, m$value))
+}
+
+gene_expression("CD38")
+```
+
+![](../plots/5D-1.png)<!-- -->
+
+```r
+# p-value = 0.02203
+
+gene_expression("PLD1")
+```
+
+![](../plots/5D-2.png)<!-- -->
+
+```r
+# p-value = 0.03436 
+
+# % 27me3 at promoter
+me3 = read.table("../data/TSS2k_H3K27me3_CLL.intersect.value_matirx_v2.tsv", head = T, fill = T)
+k2 = left_join(gene, me3,  by = c( "stable_id" = "NESG.intersect.value")) %>% 
+  select(-stable_id, -A.TSS2k, -H3K27me3, -end) 
+
+u = c("CEMT_92", "CEMT_95", "CEMT_30", "CEMT_27", "CEMT_29", "CEMT_4", "EGAN00001202788", "EGAN00001202787")
+m = c("CEMT_97", "CEMT_93", "CEMT_96", "CEMT_94", "CEMT_6", "CEMT_28", "CEMT_5", "CEMT_26", "CEMT_25",  "CEMT_1", "EGAN00001202789",  "EGAN00001265750", "EGAN00001295796", "EGAN00001235813", "EGAN00001202786")
+
+#
+ucll = k2 %>% select(contains(u) | contains("display_label")) %>% melt(id.vars = "display_label") %>% mutate(Cell = "uCLL")
+mcll = k2 %>% select(contains(m) | contains("display_label")) %>% melt(id.vars = "display_label") %>% mutate(Cell = "mCLL")
+
+ym = rbind(ucll, mcll) %>%
+  filter(grepl("CLL", variable))
+
+ym$Cell = factor(ym$Cell, levels = c("uCLL", "mCLL"))
+
+# CD38
+c = ym %>% filter(display_label == "CD38") %>%
+  ggplot(aes(Cell, value, fill = Cell)) +
+  scale_fill_manual(values=c( "#fa9fb5", "#c51b8a")) +
+  geom_boxplot() +
+  #geom_point(position = "jitter") +
+  geom_dotplot(binaxis = "y", stackdir = "center", stackratio = .5, dotsize = 1, fill = "black", alpha = .75) + 
+  theme_bw() +
+  ylab("H3K27me3") +
+  xlab("") +
+  theme(panel.background = element_rect(fill = "white"),
+        panel.border = element_rect(fill = NA, colour = "gray", size = 1),
+        strip.background =element_rect(fill="white"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_text(color = "black", angle = 0, hjust = 1),
+        axis.text.y = element_text(color = "black", hjust = 1),
+        legend.position = "none")
+
+# PLD1
+d = ym %>% filter(display_label == "PLD1") %>%
+  ggplot(aes(Cell, value, fill = Cell)) +
+  scale_fill_manual(values=c( "#fa9fb5", "#c51b8a")) +
+  geom_boxplot() +
+  geom_dotplot(binaxis = "y", stackdir = "center", stackratio = .5, dotsize = 1, fill = "black", alpha = .75) + 
+  theme_bw() +
+  ylab("H3K27me3") +
+  xlab("") +
+  theme(panel.background = element_rect(fill = "white"),
+        panel.border = element_rect(fill = NA, colour = "gray", size = 1),
+        strip.background =element_rect(fill="white"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_text(color = "black", angle = 0, hjust = 1),
+        axis.text.y = element_text(color = "black", hjust = 1),
+        legend.position = "none")
+
+# t.test
+u = ym %>% filter(display_label == "CD38" & Cell == "uCLL")
+m = ym %>% filter(display_label == "CD38" & Cell == "mCLL")
+#print(t.test(u$value, m$value))
+# 0.03
+
+u = ym %>% filter(display_label == "PLD1" & Cell == "uCLL")
+m = ym %>% filter(display_label == "PLD1" & Cell == "mCLL")
+#print(t.test(u$value, m$value))
+
+c / d
+```
+
+![](../plots/5D-3.png)<!-- -->
+
+#### 5F. Standard deviation in expression and promoter occupancy by H3K27me3.
+
+
+```r
+up = read.table("../data/mCLL_vs_uCLL_UP.txt")
+up = rownames(up)
+dn = read.table("../data/mCLL_vs_uCLL_DN.txt")
+dn = rownames(dn)
+
+k = read.table("../data/table_EGA_CEMT.txt", head = T)
+gene = read.table("../data/hg38v79_genes", header = T)[,c(1,7)]
+
+#
+mcll = c( "CLL.110", "CLL.1228",  "CLL.1525", "CLL.1532",  "CLL.3", "CLL_97", "CLL_93", "CLL_96", "CLL_94", "CLL_6", "CLL_28", "CLL_5", "CLL_26", "CLL_25",  "CLL_1")
+ucll = c("CLL.12", "CLL.182", "CLL_92", "CLL_95", "CLL_30", "CLL_27", "CLL_29", "CLL_4")
+
+u.cll = k %>% select(ENSG, ucll) 
+m.cll = k %>% select(ENSG, mcll) 
+
+## sd of gene expression
+#uCLL up-regulated 149. 
+u.cll$de <- ifelse(u.cll$ENSG %in% up, "UP", 
+                          ifelse(u.cll$ENSG %in% dn, "DN", "stable")) 
+up_in_ucll149 = u.cll %>% filter(de == "DN") %>% select(-de)
+up_in_ucll149$row_var = rowVars(as.matrix(up_in_ucll149[,c(2:ncol(up_in_ucll149))]))
+
+#mCLL down-regulated 149
+m.cll$de <- ifelse(m.cll$ENSG %in% up, "UP", 
+                          ifelse(m.cll$ENSG %in% dn, "DN", "stable")) 
+dn_in_mcll149 = m.cll %>% filter(de == "DN") %>% select(-de)
+dn_in_mcll149$row_var = rowVars(as.matrix(dn_in_mcll149[,c(2:ncol(dn_in_mcll149))]))
+
+df = data.frame(uCLL = up_in_ucll149$row_var, mCLL = dn_in_mcll149$row_var)
+#t.test(df$uCLL, df$mCLL)
+
+a = df %>% melt() %>%
+  ggplot(aes(variable, log(sqrt(value)), color = variable)) +
+  scale_color_manual(values = c("#fa9fb5", "#c51b8a")) +
+  geom_boxplot() +
+  geom_point(color = "black", alpha = .5) +
+  #geom_dotplot(binaxis = "y", stackdir = "center", stackratio = .5) + 
+  ylab("log(sd of expression)") +
+  xlab("") +
+  theme(panel.background = element_rect(fill = "white"),
+        panel.border = element_rect(fill = NA, colour = "gray", size = 1),
+        strip.background =element_rect(fill="white"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_text(color = "black", angle = 0, hjust = 1),
+        axis.text.y = element_text(color = "black", hjust = 1),
+        legend.position = "none")
+
+#t.test(df$uCLL, df$mCLL)
+
+## % promoter of 149 genes
+# % 27me3 at promoter
+me3 = read.table("../data/TSS2k_H3K27me3_CLL.intersect.value_matirx_v2.tsv", head = T, fill = T)
+k2 = me3[,4:ncol(me3)]
+
+u = c("CEMT_92", "CEMT_95", "CEMT_30", "CEMT_27", "CEMT_29", "CEMT_4", "EGAN00001202788", "EGAN00001202787")
+m = c("CEMT_97", "CEMT_93", "CEMT_96", "CEMT_94", "CEMT_6", "CEMT_28", "CEMT_5", "CEMT_26", "CEMT_25",  "CEMT_1", "EGAN00001202789",  "EGAN00001265750", "EGAN00001295796", "EGAN00001235813", "EGAN00001202786")
+
+#sd
+ucll = k2 %>% select(contains("NESG.intersect.value") | contains(u)) %>% filter(NESG.intersect.value %in% dn)
+ucll$row_var = rowVars(as.matrix(ucll[,c(2:ncol(ucll))]))
+
+mcll = k2 %>% select(contains("NESG.intersect.value") | contains(m)) %>% filter(NESG.intersect.value %in% dn)
+mcll$row_var = rowVars(as.matrix(mcll[,c(2:ncol(mcll))])) 
+
+df = data.frame(uCLL = ucll$row_var, mCLL = mcll$row_var)
+#t.test(df$uCLL, df$mCLL)
+
+b = df %>% melt() %>% 
+  ggplot(aes(variable, sqrt(value/4000), color = variable)) +
+  scale_color_manual(values = c("#fa9fb5", "#c51b8a")) +
+  geom_boxplot() +
+  geom_point(color = "black", alpha = .5) +
+  ylab("sd of promoter occupancy bt H3K27me3") +
+  xlab("") +
+  theme(panel.background = element_rect(fill = "white"),
+        panel.border = element_rect(fill = NA, colour = "gray", size = 1),
+        strip.background =element_rect(fill="white"),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_text(color = "black", angle = 0, hjust = 1),
+        axis.text.y = element_text(color = "black", hjust = 1),
+        legend.position = "none")
+
+#t.test(df$uCLL, df$mCLL)
+a / b
+```
+
+![](../plots/5F-1.png)<!-- -->
+
+#### 5H. Profiles for NOTCH1-mutation subtypes.
+
+
+```r
+#h3k27ac enriched at delct
+x = read.table("../data/H3K27ac.delct_H3K27ac.2kb.colMean.cll.libs", head = T)
+delct = x %>% 
+    select(contains("CEMT_27"), 
+           contains("CEMT_29"), 
+           contains("EGAN00001202788"))
+delct_mean = rowMeans(delct)
+
+wt = x %>% 
+    select(-contains("CEMT_27"), -contains("CEMT_29"), -contains("EGAN00001202788"))  %>%
+    select(-contains("NoInput")) %>%
+    select(-contains("CEMT_4")) # CEMT_4 is an outlier in H3K27me3 heatmap and removed 
+wt_mean = rowMeans(wt)
+
+x = data.frame(delct_mean, wt_mean)
+t = x[1,]
+x2 = (t(x)/as.numeric(t))
+x3 = data.frame(t(x2))
+df = x3
+df2 = data.frame(df, x = 1:nrow(df))
+df3 = melt(df2, id.vars = "x")
+
+g1 = df3 %>% 
+  ggplot(aes(x, value, color = variable)) +
+    geom_line() +
+  xlab("") +
+  ylab("") +
+  scale_color_manual(values = c("#31a354", "#636363")) +
+    theme(panel.background = element_rect(fill = "white"),
+        panel.border = element_rect(fill = NA, colour = "gray", size = 1),
+        strip.background =element_rect(fill="white"),
+        legend.position = "none",
+        axis.text = element_text(color = "black"))
+
+#h3k27me3 enriched at wt
+x = read.table("../data/H3K27me3.wt_H3K27me3.2kb.colMean.cll.libs", head = T)
+delct = x %>% 
+    select(contains("CEMT_27"), 
+           contains("CEMT_29"), 
+           contains("EGAN00001202788"))
+delct_mean = rowMeans(delct)
+
+wt = x %>% 
+    select(-contains("CEMT_27"), -contains("CEMT_29"), -contains("EGAN00001202788"))  %>%
+    select(-contains("NoInput")) %>%
+    select(-contains("CEMT_4")) # CEMT_4 is an outlier in H3K27me3 heatmap and removed 
+wt_mean = rowMeans(wt)
+x = data.frame(delct_mean, wt_mean)
+
+t = x[1,]
+x2 = (t(x)/as.numeric(t))
+x3 = data.frame(t(x2))
+df = x3
+df2 = data.frame(df, x = 1:nrow(df))
+df3 = melt(df2, id.vars = "x")
+
+g2 = df3 %>% 
+  ggplot(aes(x, value, color = variable)) +
+  geom_line() +
+  xlab("") +
+  ylab("") +
+  scale_color_manual(values = c("#31a354", "#636363")) +
+    theme(panel.background = element_rect(fill = "white"),
+        panel.border = element_rect(fill = NA, colour = "gray", size = 1),
+        strip.background =element_rect(fill="white"),
+        legend.position = "none",
+        axis.text = element_text(color = "black"))
+
+(g2 / g1)
+```
+
+![](../plots/5H-1.png)<!-- -->
+
+### Figure S1.
 
 #### S4D
 
@@ -1579,7 +2065,7 @@ hl %>%
         axis.text = element_text(color = "black", angle = 0, vjust = 0.5, hjust=1)) 
 ```
 
-![](../plots/unnamed-chunk-6-1.png)<!-- -->
+![](../plots/unnamed-chunk-4-1.png)<!-- -->
 
 ### Figure S2
 
@@ -1639,7 +2125,7 @@ xm2 %>%
   guides(y = "none")
 ```
 
-![](../plots/unnamed-chunk-7-1.png)<!-- -->
+![](../plots/unnamed-chunk-5-1.png)<!-- -->
 
 #### S2I
 
@@ -1697,7 +2183,7 @@ xm2 %>%
   guides(y = "none")
 ```
 
-![](../plots/unnamed-chunk-8-1.png)<!-- -->
+![](../plots/unnamed-chunk-6-1.png)<!-- -->
 
 ### Figure S3
 
@@ -1740,3 +2226,126 @@ ggsurvplot(fit,
 ```
 
 ![](../plots/S3D-1.png)<!-- -->
+
+#### S5B
+
+
+```r
+k = read.table("../data/table_EGA_CEMT.txt", head = T)
+gene = read.table("../data/hg38v79_genes", header = T)[,c(1,7)]
+k2 = left_join(gene, k,  by = c( "stable_id" = "ENSG")) %>% 
+  na.omit() %>% 
+  select(-stable_id) 
+
+xm = melt(k2) %>%
+  filter(grepl("CLL", variable))
+
+mcll = c( "CLL.110", "CLL.1228",  "CLL.1525", "CLL.1532",  "CLL.3", "CLL_97", "CLL_93", "CLL_96", "CLL_94", "CLL_6", "CLL_28", "CLL_5", "CLL_26", "CLL_25",  "CLL_1")
+ucll = c("CLL.12", "CLL.182", "CLL_92", "CLL_95", "CLL_30", "CLL_27", "CLL_29", "CLL_4")
+
+xm$Cell <- ifelse(xm$variable %in% mcll, "mCLL", 
+                          ifelse(xm$variable %in% ucll, "uCLL", "nothing"))
+
+
+# % 27me3 at promoter
+me3 = read.table("../data//TSS2k_H3K27me3_CLL.intersect.value_matirx_v2.tsv", head = T, fill = T)
+k2 = left_join(gene, me3,  by = c( "stable_id" = "NESG.intersect.value")) %>% 
+  select(-stable_id, -A.TSS2k, -H3K27me3, -end) 
+
+u = c("CEMT_92", "CEMT_95", "CEMT_30", "CEMT_27", "CEMT_29", "CEMT_4", "EGAN00001202788", "EGAN00001202787")
+m = c("CEMT_97", "CEMT_93", "CEMT_96", "CEMT_94", "CEMT_6", "CEMT_28", "CEMT_5", "CEMT_26", "CEMT_25",  "CEMT_1", "EGAN00001202789",  "EGAN00001265750", "EGAN00001295796", "EGAN00001235813", "EGAN00001202786")
+
+#
+ucll = k2 %>% select(contains(u) | contains("display_label")) %>% melt(id.vars = "display_label") %>% mutate(Cell = "uCLL")
+mcll = k2 %>% select(contains(m) | contains("display_label")) %>% melt(id.vars = "display_label") %>% mutate(Cell = "mCLL")
+
+ym = rbind(ucll, mcll) %>%
+  filter(grepl("CLL", variable))
+
+ym[is.na(ym)] <- 0
+
+ym2 = ym %>%
+  mutate(type = ifelse(grepl("EGAN00001202789_EGAX00001231899_EGAR00001245925", variable), "CLL.110",
+                ifelse(grepl("EGAN00001295796_EGAX00001364335_EGAR00001401453", variable), "CLL.1228",
+                ifelse(grepl("EGAN00001202788_EGAX00001272594_EGAR00001300135", variable), "CLL.12",
+                ifelse(grepl("EGAN00001235813_EGAX00001234408_EGAR00001248463", variable), "CLL.1525",
+                ifelse(grepl("EGAN00001265750_EGAX00001272586_EGAR00001300133", variable), "CLL.1532",
+                ifelse(grepl("EGAN00001202787_EGAX00001272597_EGAR00001300138", variable), "CLL.182",
+                ifelse(grepl("EGAN00001202786_EGAX00001231898_EGAR00001245924", variable), "CLL.3",
+                ifelse(grepl("CEMT_1", variable), "CLL_1",
+                ifelse(grepl("CEMT_25", variable), "CLL_25",
+                ifelse(grepl("CEMT_26", variable), "CLL_26",
+                ifelse(grepl("CEMT_27", variable), "CLL_27",
+                ifelse(grepl("CEMT_28", variable), "CLL_28",
+                ifelse(grepl("CEMT_29", variable), "CLL_29",
+                ifelse(grepl("CEMT_30", variable), "CLL_30",
+                ifelse(grepl("CEMT_4", variable), "CLL_4",
+                ifelse(grepl("CEMT_5", variable), "CLL_5",
+                ifelse(grepl("CEMT_6", variable), "CLL_6",
+                ifelse(grepl("CEMT_92", variable), "CLL_92",
+                ifelse(grepl("CEMT_93", variable), "CLL_93",
+                ifelse(grepl("CEMT_94", variable), "CLL_94",
+                ifelse(grepl("CEMT_95", variable), "CLL_95",
+                ifelse(grepl("CEMT_96", variable), "CLL_96",
+                ifelse(grepl("CEMT_97", variable), "CLL_97",
+                       "nothing"))))))))))))))))))))))))
+
+print("corr CD38")
+```
+
+```
+## [1] "corr CD38"
+```
+
+```r
+tmp_exp = xm %>% filter(display_label == "CD38")
+tmp_me3 = ym2 %>% filter(display_label == "CD38")
+tmp_cor = inner_join(tmp_exp, tmp_me3, by = c("variable" = "type"))
+cor(tmp_cor$value.x,tmp_cor$value.y)
+```
+
+```
+## [1] -0.8454004
+```
+
+```r
+a = tmp_cor %>% ggplot(aes(value.x, value.y)) +
+  geom_point(aes(color = Cell.x)) +
+  geom_smooth(method='lm', formula= y~x) +
+  xlab("Gene expression") +
+  ylab("Promoter occupancy by H3K27me3") +
+  theme_bw() +
+  theme(legend.position = "none") +
+  ggtitle("CD38")
+
+print("corr PLD1")
+```
+
+```
+## [1] "corr PLD1"
+```
+
+```r
+tmp_exp = xm %>% filter(display_label == "PLD1")
+tmp_me3 = ym2 %>% filter(display_label == "PLD1")
+tmp_cor = inner_join(tmp_exp, tmp_me3, by = c("variable" = "type"))
+cor(tmp_cor$value.x,tmp_cor$value.y)
+```
+
+```
+## [1] -0.8246914
+```
+
+```r
+b = tmp_cor %>% ggplot(aes(value.x, value.y)) +
+  geom_point(aes(color = Cell.x)) +
+  geom_smooth(method='lm', formula= y~x) +
+  xlab("Gene expression") +
+  ylab("") +
+  theme_bw() +
+  ggtitle("PLD1")
+  
+a + b
+```
+
+![](../plots/S5B-1.png)<!-- -->
