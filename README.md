@@ -2,7 +2,7 @@
 The epigenome of chronic lymphocytic leukemia (CLL) is characterized by the accumulation of epigenetic aberrations. Annotating CLL-specific epigenetic signatures and those that reflect normal B-cell development remains challenging due to heterogeneity within B-cell populations and CLL cases. Here, we analyzed 50 reference epigenomes of CLL and B-cell subtypes to map the interconnected layers of epigenetic aberrations in CLL. This repository contains the source code for the integrative analysis of B-cell and CLL epigenomes. 
 
 ### 1. Rscripts for figures 
-- Please find the scripts and plots [here](https://rashedul.github.io/bcell_cll_epigenomes/)
+- Find the scripts and plots [here](https://rashedul.github.io/bcell_cll_epigenomes/)
 
 ### 2. Generate figures
 
@@ -13,25 +13,23 @@ The epigenome of chronic lymphocytic leukemia (CLL) is characterized by the accu
 - pandoc >= 2.9.2.1
 - conda >= 24.7.1
 - RAM ~32GB 
-- Runtime ~60 minutes 
+- Runtime ~5 minutes 
 
 #### Create R environment and install R packages
 
-In a Linux/Unix terminal, execute the following commands to create an R environment (`renv`) and install the necessary R packages. Make sure that conda is already installed.
+In a Linux/Unix terminal, execute the following commands to create an R environment (`renv`) and install the necessary R packages. 
 
 ```
 # Install packages from conda
 conda create -n renv r-base -y
 conda activate renv
-conda install -c conda-forge -y r-ggplot2 r-dplyr r-pandoc
+conda install -c conda-forge -y r-ggplot2 r-dplyr r-pandoc r-tidyverse r-reshape2 r-factoextra r-pheatmap r-UpSetR r-data.table r-survival r-survminer r-readxl r-ggrepel r-patchwork r-matrixStats r-codetools
 
 # Install packages outside of conda
-
-# did not install dependencies
-R -e "install.packages('tidyverse', repos='http://cran.r-project.org', dependencies = TRUE)"
+R -e "install.packages('circlize', repos='http://cran.r-project.org', dependencies = TRUE)"
 ```
 
-#### Run Rscript to generate plots
+#### Download the project repository and run Rscript to generate plots
 
 In a Linux/Unix terminal, run the command to generate plots. This will create .md and .html files that include the scripts and resulting plots.
 

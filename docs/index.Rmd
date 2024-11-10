@@ -20,34 +20,6 @@ knitr::opts_chunk$set(fig.width=12,
                       message=FALSE)
 ```
 
-```{r setup, include=FALSE}
-# List of packages needed
-packages <- c(
-  "tidyverse",
-  "reshape2",
-  "factoextra",
-  "pheatmap",
-  "circlize",
-  "UpSetR",
-  "data.table",
-  "survival",
-  "survminer",
-  "readxl",
-  "ggrepel"
-)
-
-# Function to install and load packages if not already installed
-install_and_load <- function(package) {
-  if (!requireNamespace(package, quietly = TRUE)) {
-    install.packages(package, dependencies = TRUE)
-  }
-  library(package, character.only = TRUE)
-}
-
-# Install and load each package
-lapply(packages, install_and_load)
-```
-
 ```{r libs, warning=F, message=F, cache=T}
 library(tidyverse)
 library(reshape2)
@@ -60,6 +32,9 @@ library(survival)
 library(survminer)
 library(readxl)
 library(ggrepel)
+library(patchwork)
+library(matrixStats)
+library(codetools)
 ```
 
 ```{r exp func, warning=F, message=F, cache=T}
@@ -1326,9 +1301,9 @@ ggplot(df2, aes(axis, value, group = variable, color = Cell)) +
 
 #### 4B. Intersection of hypomethylated CpGs.
 
-```{r 4B, warning=F, message=F, cache=T}
+```{r 4B, warning=F, message=F, cache=T, eval = FALSE}
 #plot for dn cpgs
-x = fread("../data/UP_CpG_binary_intersect.txt")
+x = fread("../data/UP_CpG_binary_intersect.txt") # file is too big to share on github
 names(x) = gsub(".UP.txt.1-0insert.Value","",names(x)) 
 
 upset(x, sets = c("High-mCLL", "High-uCLL", "Low-High",  "Low-mCLL",  "Low-uCLL", "uCLL-mCLL"), 
