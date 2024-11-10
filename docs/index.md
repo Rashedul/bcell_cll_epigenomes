@@ -13,6 +13,8 @@ output:
 
 
 
+
+
 ```r
 library(tidyverse)
 library(reshape2)
@@ -21,10 +23,9 @@ library(pheatmap)
 library(circlize)
 library(UpSetR)
 library(data.table)
-library(parallel)
 library(survival)
 library(survminer)
-#library(matrixStats)
+library(readxl)
 library(ggrepel)
 ```
 
@@ -1752,7 +1753,7 @@ xm2$Cell = factor(xm2$Cell, levels = c("HMPC", "CLP", "NBC", "GCBC", "MBC", "PBC
 
 xm2 = xm2 %>% filter(Cell == "uCLL" | Cell ==  "mCLL")
 
-gene_expression = function(geneName)
+gene_expression2 = function(geneName)
 {
   plot = xm2 %>% filter(display_label == geneName) %>%
     ggplot(aes(Cell, value, fill = Cell)) +
@@ -1779,7 +1780,7 @@ gene_expression = function(geneName)
   #print(t.test(u$value, m$value))
 }
 
-gene_expression("CD38")
+gene_expression2("CD38")
 ```
 
 ![](../plots/5D-1.png)<!-- -->
@@ -1787,7 +1788,7 @@ gene_expression("CD38")
 ```r
 # p-value = 0.02203
 
-gene_expression("PLD1")
+gene_expression2("PLD1")
 ```
 
 ![](../plots/5D-2.png)<!-- -->
@@ -2035,41 +2036,93 @@ g2 = df3 %>%
 
 ![](../plots/5H-1.png)<!-- -->
 
-### Figure S1.
+### Figure S1
 
-#### S4D
+#### S1A. Count of differntially enriched regions. 
 
 
 ```r
-## cemt all data
-x = read.table("../data/cemt_H3K36me3_readcount.txt", header = F)
-h = data.frame(var =x$V1, type = x$V3, value = x$V4)
-l = data.frame(var =x$V1, type = x$V5, value = x$V6)
-hl = rbind(h, l)
+x = read.table("../data/de_chipseq/enrichement_over_each_other/de_up_dn_all_cell.txt")
+x$V2 = factor(x$V2, levels = c("H3K27ac", "H3K4me3", "H3K36me3",  "H3K4me1", "H3K27me3", "H3K9me3"))
+x$V3 = factor(x$V3, levels = c( "NBC", "GCBC", "MBC",  "PBC", "CLL"))
 
-hl$type = factor(hl$type, levels = c("Low", "High"))
+c = x %>% filter(V3 == "CLL") %>% filter(V4 == "enriched") %>%  group_by(V2) %>% summarise(sum(abs(V1)))
+cn = x %>% filter(V3 == "CLL") %>% filter(V4 == "not") %>%  group_by(V2) %>% summarise(sum(abs(V1)))
+g = x %>% filter(V3 == "GCBC") %>% filter(V4 == "enriched") %>%  group_by(V2) %>% summarise(sum(abs(V1)))
+gn = x %>% filter(V3 == "GCBC") %>% filter(V4 == "not") %>%  group_by(V2) %>% summarise(sum(abs(V1)))
+t = x %>% group_by(V2) %>% summarise(sum(abs(V1)))
 
-hl %>% 
-  ggplot(aes(type, value, group=var, color = type)) +
-  geom_boxplot(aes(group = type)) +
-  geom_point() + 
-  geom_line(aes(color = "black")) +
-  scale_color_manual(values = c( "#C61D8A", "black", "gray")) +
-  #facet_grid(~cell) +
-  ylab("Average of H3K36me3 normalized read density") +
+ggplot(x, aes(V2, V1, fill = V3)) +
+  geom_bar(stat = "identity", position = "dodge") +
   xlab("") +
-  theme(panel.background = element_rect(fill = "white"),
-        panel.border = element_rect(fill = NA, colour = "gray", size = 1),
-        strip.background =element_rect(fill="white"),
-        legend.position = "bottom",
-        axis.text = element_text(color = "black", angle = 0, vjust = 0.5, hjust=1)) 
+  ylab("Number of DE regions") +
+  geom_hline(yintercept = 0) +
+  scale_fill_manual(values = c("#636363", "#35B779FF", "#26828EFF", "#3E4A89FF",  "#C61D8A")) +
+  theme_bw() +
+  coord_flip()
 ```
 
 ![](../plots/unnamed-chunk-4-1.png)<!-- -->
 
+#### S1B. Pathyway enrichment.
+
+
+```r
+#great
+library(forcats)
+x = read_tsv("../data/de_chipseq/greatExportAll_H3K4me1_CLL.tsv")
+
+x %>% filter(Hyper_FDR_QVal <= 0.01) %>%
+  mutate(TermName = fct_reorder(TermName, -log10(Hyper_FDR_QVal))) %>%
+  ggplot(aes(x = TermName, y = -log10(Hyper_FDR_QVal))) + 
+  geom_col() +
+  coord_flip() +
+  xlab("") +
+  ylab("-log10(Hypergeometric FDR Q-Value)") +
+  theme_bw()
+```
+
+![](../plots/S1B-1.png)<!-- -->
+
+#### S1C. Expression of CBFA2T3.
+
+
+```r
+gene_expression("CBFA2T3")
+```
+
+![](../plots/S1C-1.png)<!-- -->
+
+#### S1D. Expression of CRTC1.
+
+
+```r
+gene_expression("CRTC1")
+```
+
+![](../plots/S1D-1.png)<!-- -->
+
 ### Figure S2
 
-#### S2F
+#### S2C. Expression of CREBBP.
+
+
+```r
+gene_expression("CREBBP")
+```
+
+![](../plots/S2C-1.png)<!-- -->
+
+#### S2D. Expression of EP300.
+
+
+```r
+gene_expression("EP300")
+```
+
+![](../plots/S2D-1.png)<!-- -->
+
+#### S2F. DNAme at CD6 enhancers.
 
 
 ```r
@@ -2125,9 +2178,9 @@ xm2 %>%
   guides(y = "none")
 ```
 
-![](../plots/unnamed-chunk-5-1.png)<!-- -->
+![](../plots/S2F-1.png)<!-- -->
 
-#### S2I
+#### S2I. DNAme at PMAIP1 enhancers.
 
 
 ```r
@@ -2183,15 +2236,103 @@ xm2 %>%
   guides(y = "none")
 ```
 
-![](../plots/unnamed-chunk-6-1.png)<!-- -->
+![](../plots/S2I-1.png)<!-- -->
 
 ### Figure S3
 
-#### S3
+#### S3B. DANme at cll type spcecific enhancers. 
 
 
+```r
+x = read.table("../data/AvgMeth_5celltype_H3K27ac_enriched_over4cell_0.75percent.txt")
+colnames(x) = c("id", "type", "met")
 
-#### S3D
+y = read.table("../data/avgMetGenomeWide_53samples_v2.txt")
+y = y %>%
+  mutate(type = "global")
+colnames(y) = c("id", "met", "type")
+y$id <- gsub('.bed', '', y$id)
+
+df = rbind(x,y)
+
+
+df = df %>% 
+  filter(!grepl("EGAN00001286337", id)) %>% 
+  filter(!grepl("CLL_29", id)) 
+
+df$id <- gsub('.bed.combine.5mC.CpG', '', df$id)
+df$id <- gsub('.combine.5mC.CpG', '', df$id)
+df$type <- gsub('.enriched_over4cell_0.75percent_matrix.tsv.4col', '', df$type)
+df$type <- gsub('H3K27ac.', '', df$type)
+
+ucll = c("EGAN00001343492:CLL.12:12CLL", "EGAN00001343490:CLL.182:182CLL", "CLL_95", "CLL_30", "CLL_30.large", "CLL_30.small", "CLL_27", "CLL_29", "CLL_4")
+
+df$Cell <- ifelse(df$id %in% ucll, "uCLL",
+                    ifelse(grepl("GCBC", df$id, ignore.case = T), "GCBC", 
+                           ifelse(grepl("csMBC", df$id, ignore.case = T), "MBC", 
+                                  ifelse(grepl("HMPC", df$id, ignore.case = T), "HMPC",
+                           ifelse(grepl("NBC", df$id, ignore.case = T), "NBC",
+                           ifelse(grepl("PBC", df$id, ignore.case = T), "PBC",
+                           ifelse(grepl("PreBC", df$id, ignore.case = T), "PreBC",
+                           ifelse(grepl("MBC", df$id, ignore.case = T), "MBC", "mCLL"))))))))
+
+df$Cell = factor(df$Cell, levels = c("HMPC","PreBC" , "NBC", "GCBC", "MBC", "PBC", "uCLL", "mCLL"))
+
+df %>%
+    ggplot(aes(Cell, met)) +
+    geom_boxplot(aes(color = Cell)) +
+    scale_color_manual(values = c("#636363", "#636363",  "#636363", "#35B779FF", "#26828EFF", "#3E4A89FF", "#fa9fb5", "#c51b8a")) +
+    xlab("") +
+    ylab("Average methylation") +
+  facet_grid(~type) +
+  theme_bw() +
+  theme(panel.background = element_rect(fill = "white"),
+        panel.border = element_rect(fill = NA, colour = "gray", size = 1),
+        strip.background =element_rect(fill="white"),
+        axis.text = element_text(color = "black"),
+        legend.position = "bottom",
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+```
+
+![](../plots/S3B-1.png)<!-- -->
+
+#### S3C. IGHV mutational frequency. 
+
+
+```r
+x = read_excel("../data/CEMT_CRIS.xlsx")
+x2 = x %>% select(CEMT_ID, CRIS_BWA...5)
+
+low = c("CEMT_97", "CEMT_94", "CEMT_5")
+high = c("CEMT_96", "CEMT_25", "CEMT_28", "CEMT_6", "CEMT_26")
+
+l = x2 %>%
+  filter(CEMT_ID %in% low) %>%
+  mutate(type = "Low")
+
+h = x2 %>%
+  filter(CEMT_ID %in% high) %>%
+  mutate(type = "High")
+
+df = rbind(l, h)
+
+df %>%
+  ggplot(aes(type, CRIS_BWA...5)) +
+  geom_boxplot() +
+  geom_jitter(width = .05) +
+  xlab("") +
+  ylab("IGHV mutational frequency") +
+  theme(panel.background = element_rect(fill = "white"),
+        panel.border = element_rect(fill = NA, colour = "black", size = .5),
+        strip.background =element_rect(fill="white"),
+        axis.text = element_text(color = "black", angle = 0, hjust = 1),
+        legend.position = "bottom")
+```
+
+![](../plots/S3C-1.png)<!-- -->
+
+#### S3D. CEMT progression free survival. 
 
 
 ```r
@@ -2227,7 +2368,56 @@ ggsurvplot(fit,
 
 ![](../plots/S3D-1.png)<!-- -->
 
-#### S5B
+### Figure S4
+
+#### S4D. H3K36me3 at low and high CpG density regions. 
+
+
+```r
+## cemt all data
+x = read.table("../data/cemt_H3K36me3_readcount.txt", header = F)
+h = data.frame(var =x$V1, type = x$V3, value = x$V4)
+l = data.frame(var =x$V1, type = x$V5, value = x$V6)
+hl = rbind(h, l)
+
+hl$type = factor(hl$type, levels = c("Low", "High"))
+
+hl %>% 
+  ggplot(aes(type, value, group=var, color = type)) +
+  geom_boxplot(aes(group = type)) +
+  geom_point() + 
+  geom_line(aes(color = "black")) +
+  scale_color_manual(values = c( "#C61D8A", "black", "gray")) +
+  #facet_grid(~cell) +
+  ylab("Average of H3K36me3 normalized read density") +
+  xlab("") +
+  theme(panel.background = element_rect(fill = "white"),
+        panel.border = element_rect(fill = NA, colour = "gray", size = 1),
+        strip.background =element_rect(fill="white"),
+        legend.position = "bottom",
+        axis.text = element_text(color = "black", angle = 0, vjust = 0.5, hjust=1)) 
+```
+
+![](../plots/S4D-1.png)<!-- -->
+
+#### S4E. Expression of AXIN1 and EP400. 
+
+
+```r
+gene_expression("AXIN1")
+```
+
+![](../plots/S4E-1.png)<!-- -->
+
+```r
+gene_expression("EP400")
+```
+
+![](../plots/S4E-2.png)<!-- -->
+
+### Figure S5
+
+#### S5B. Correlation between expression and H3k27me3. 
 
 
 ```r
@@ -2349,3 +2539,59 @@ a + b
 ```
 
 ![](../plots/S5B-1.png)<!-- -->
+
+### R Session 
+
+
+```r
+sessionInfo()
+```
+
+```
+## R version 4.2.2 (2022-10-31 ucrt)
+## Platform: x86_64-w64-mingw32/x64 (64-bit)
+## Running under: Windows 10 x64 (build 22631)
+## 
+## Matrix products: default
+## 
+## locale:
+## [1] LC_COLLATE=English_United States.utf8 
+## [2] LC_CTYPE=English_United States.utf8   
+## [3] LC_MONETARY=English_United States.utf8
+## [4] LC_NUMERIC=C                          
+## [5] LC_TIME=English_United States.utf8    
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+##  [1] readxl_1.4.3       ggrepel_0.9.4      matrixStats_1.2.0  survminer_0.4.9   
+##  [5] ggpubr_0.6.0       survival_3.5-3     patchwork_1.1.3    data.table_1.14.10
+##  [9] UpSetR_1.4.0       circlize_0.4.15    pheatmap_1.0.12    factoextra_1.0.7  
+## [13] reshape2_1.4.4     lubridate_1.9.3    forcats_1.0.0      stringr_1.5.1     
+## [17] dplyr_1.1.4        purrr_1.0.2        readr_2.1.4        tidyr_1.3.0       
+## [21] tibble_3.2.1       ggplot2_3.4.4      tidyverse_2.0.0   
+## 
+## loaded via a namespace (and not attached):
+##  [1] sass_0.4.8          jsonlite_1.8.8      splines_4.2.2      
+##  [4] carData_3.0-5       bslib_0.6.1         cellranger_1.1.0   
+##  [7] yaml_2.3.8          pillar_1.9.0        backports_1.4.1    
+## [10] lattice_0.20-45     glue_1.6.2          digest_0.6.33      
+## [13] RColorBrewer_1.1-3  ggsignif_0.6.4      colorspace_2.1-0   
+## [16] htmltools_0.5.7     Matrix_1.6-4        plyr_1.8.9         
+## [19] pkgconfig_2.0.3     broom_1.0.5         xtable_1.8-4       
+## [22] scales_1.3.0        km.ci_0.5-6         KMsurv_0.1-5       
+## [25] tzdb_0.4.0          timechange_0.2.0    generics_0.1.3     
+## [28] car_3.1-2           cachem_1.0.8        withr_2.5.2        
+## [31] cli_3.6.2           magrittr_2.0.3      evaluate_0.23      
+## [34] fansi_1.0.6         rstatix_0.7.2       tools_4.2.2        
+## [37] hms_1.1.3           GlobalOptions_0.1.2 lifecycle_1.0.4    
+## [40] munsell_0.5.0       compiler_4.2.2      jquerylib_0.1.4    
+## [43] rlang_1.1.2         grid_4.2.2          rstudioapi_0.15.0  
+## [46] rmarkdown_2.25      gtable_0.3.4        abind_1.4-5        
+## [49] R6_2.5.1            gridExtra_2.3       zoo_1.8-12         
+## [52] knitr_1.45          fastmap_1.1.1       survMisc_0.5.6     
+## [55] utf8_1.2.4          shape_1.4.6         stringi_1.8.3      
+## [58] Rcpp_1.0.11         vctrs_0.6.5         tidyselect_1.2.0   
+## [61] xfun_0.41
+```
