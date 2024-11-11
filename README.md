@@ -45,7 +45,7 @@ Rscript -e "rmarkdown::render('index.Rmd', output_format = 'all')"
  
 To generate the output document from the R Markdown file `index.Rmd`, 
 
-Step 1: Install listed packages through RStudio.
+Step 1: Through RStudio, install the packages (`tidyverse, reshape2, factoextra, pheatmap, circlize, UpSetR, data.table, survival, survminer, readxl, ggrepel, patchwork, matrixStats, codetools`).
 
 Step 2: Knit the document by clicking the Knit button in the toolbar of RStudio. This will process the `index.Rmd` file and generate the output documents (such as HTML, MD).
 
