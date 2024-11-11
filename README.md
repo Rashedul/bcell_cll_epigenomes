@@ -41,13 +41,13 @@ cd ./bcell_cll_epigenomes/docs
 Rscript -e "rmarkdown::render('index.Rmd', output_format = 'all')"
 ```
 
-#### Alternatively Knit the R Markdown File on Windows and MacOS
+#### Alternatively, use the Knit feature in RStudio to generate the R Markdown file on Windows and macOS
  
 To generate the output document from the R Markdown file `index.Rmd`, 
 
 Step 1: Install listed packages.
 
-Step 2: Knit the document by clicking the Knit button in the toolbar. This will process the `index.Rmd` file and generate the output documents (such as HTML, MD).
+Step 2: Knit the document by clicking the Knit button in the toolbar of RStudio. This will process the `index.Rmd` file and generate the output documents (such as HTML, MD).
 
 ### 3. Pseudocode for data processing
 - Find the pseudocodes for data processing pipelines [here](https://github.com/Rashedul/bcell_cll_epigenomes/blob/main/docs/pseudocode.md)
