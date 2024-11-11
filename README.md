@@ -41,7 +41,7 @@ cd ./bcell_cll_epigenomes/docs
 Rscript -e "rmarkdown::render('index.Rmd', output_format = 'all')"
 ```
 
-#### Alternatively, use the Knit feature in RStudio to generate the R Markdown file on Windows and macOS
+#### Alternatively, use RStudio to knit the R Markdown file on Windows and macOS
  
 To generate the output document from the R Markdown file `index.Rmd`, 
 
