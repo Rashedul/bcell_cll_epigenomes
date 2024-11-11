@@ -12,8 +12,8 @@ The epigenome of chronic lymphocytic leukemia (CLL) is characterized by the accu
 - R version >= 4.3.1
 - pandoc >= 2.9.2.1
 - conda >= 24.7.1
-- RAM ~10GB 
-- Runtime ~10 minutes 
+- RAM ~32GB 
+- Runtime ~20 minutes 
 
 #### Create R environment and install R packages
 
