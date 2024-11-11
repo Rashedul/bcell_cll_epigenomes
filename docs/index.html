@@ -1582,7 +1582,10 @@ library(data.table)
 library(survival)
 library(survminer)
 library(readxl)
-library(ggrepel)</code></pre>
+library(ggrepel)
+library(patchwork)
+library(matrixStats)
+library(codetools)</code></pre>
 <pre class="r"><code>EGA_CEMT = read.table(&quot;../data/table_EGA_CEMT.txt&quot;, head = T)
 geneid = read.table(&quot;../data/hg38v79_genes&quot;, header = T)[,c(1,7)]
 EGA_CEMT2 = left_join(geneid, EGA_CEMT,  by = c( &quot;stable_id&quot; = &quot;ENSG&quot;)) %&gt;% na.omit() %&gt;% select(-stable_id)
@@ -2844,7 +2847,7 @@ in CLL.</h3>
 <div id="b.-intersection-of-hypomethylated-cpgs." class="section level4">
 <h4>4B. Intersection of hypomethylated CpGs.</h4>
 <pre class="r"><code>#plot for dn cpgs
-x = fread(&quot;../data/UP_CpG_binary_intersect.txt&quot;)
+x = fread(&quot;../data/UP_CpG_binary_intersect.txt&quot;) # file is too big to share on github
 names(x) = gsub(&quot;.UP.txt.1-0insert.Value&quot;,&quot;&quot;,names(x)) 
 
 upset(x, sets = c(&quot;High-mCLL&quot;, &quot;High-uCLL&quot;, &quot;Low-High&quot;,  &quot;Low-mCLL&quot;,  &quot;Low-uCLL&quot;, &quot;uCLL-mCLL&quot;), 

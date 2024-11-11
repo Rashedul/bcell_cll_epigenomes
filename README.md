@@ -8,12 +8,12 @@ The epigenome of chronic lymphocytic leukemia (CLL) is characterized by the accu
 
 #### Requirements
 
-- Ubuntu >= 22.04.4 LTS or macOS >= 13.7 
-- R version >= 4.1.2
+- Ubuntu >= 22.04.4 LTS  
+- R version >= 4.3.1
 - pandoc >= 2.9.2.1
 - conda >= 24.7.1
 - RAM ~32GB 
-- Runtime ~5 minutes 
+- Runtime ~10 minutes 
 
 #### Create R environment and install R packages
 
@@ -21,7 +21,7 @@ In a Linux/Unix terminal, execute the following commands to create an R environm
 
 ```
 # Install packages from conda
-conda create -n renv r-base -y
+conda create -n renv r-base=4.3 -y
 conda activate renv
 conda install -c conda-forge -y r-ggplot2 r-dplyr r-pandoc r-tidyverse r-reshape2 r-factoextra r-pheatmap r-UpSetR r-data.table r-survival r-survminer r-readxl r-ggrepel r-patchwork r-matrixStats r-codetools
 

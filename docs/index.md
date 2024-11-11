@@ -13,8 +13,6 @@ output:
 
 
 
-
-
 ```r
 library(tidyverse)
 library(reshape2)
@@ -27,6 +25,9 @@ library(survival)
 library(survminer)
 library(readxl)
 library(ggrepel)
+library(patchwork)
+library(matrixStats)
+library(codetools)
 ```
 
 
@@ -1368,7 +1369,7 @@ ggplot(df2, aes(axis, value, group = variable, color = Cell)) +
 
 ```r
 #plot for dn cpgs
-x = fread("../data/UP_CpG_binary_intersect.txt")
+x = fread("../data/UP_CpG_binary_intersect.txt") # file is too big to share on github
 names(x) = gsub(".UP.txt.1-0insert.Value","",names(x)) 
 
 upset(x, sets = c("High-mCLL", "High-uCLL", "Low-High",  "Low-mCLL",  "Low-uCLL", "uCLL-mCLL"), 
