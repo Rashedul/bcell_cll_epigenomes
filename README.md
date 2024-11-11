@@ -12,7 +12,7 @@ The epigenome of chronic lymphocytic leukemia (CLL) is characterized by the accu
 - R version >= 4.3.1
 - pandoc >= 2.9.2.1
 - conda >= 24.7.1
-- RAM ~32GB 
+- RAM ~10GB 
 - Runtime ~10 minutes 
 
 #### Create R environment and install R packages
@@ -20,18 +20,18 @@ The epigenome of chronic lymphocytic leukemia (CLL) is characterized by the accu
 In a Linux/Unix terminal, execute the following commands to create an R environment (`renv`) and install the necessary R packages. 
 
 ```
-# Install packages from conda
+# Install R packages from conda
 conda create -n renv r-base=4.3 -y
 conda activate renv
 conda install -c conda-forge -y r-ggplot2 r-dplyr r-pandoc r-tidyverse r-reshape2 r-factoextra r-pheatmap r-UpSetR r-data.table r-survival r-survminer r-readxl r-ggrepel r-patchwork r-matrixStats r-codetools
 
-# Install packages outside of conda
+# Install R packages outside of conda
 R -e "install.packages('circlize', repos='http://cran.r-project.org', dependencies = TRUE)"
 ```
 
 #### Download the project repository and run Rscript to generate plots
 
-In a Linux/Unix terminal, run the command to generate plots. This will create .md and .html files that include the scripts and resulting plots.
+In a terminal, run the command to generate plots. This will create .md and .html files that include the scripts and resulting plots.
 
 ```
 # Clone the repo
